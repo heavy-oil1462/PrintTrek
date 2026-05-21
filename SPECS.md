@@ -3,7 +3,7 @@
 ## Overall Goals
 - **Tow Vehicle:** Ford Ranger
 - **Track Width and Bolt Pattern:** Matched exactly to the tow vehicle (6x139.7). Tire size: 265/60R18 Falken Wildpeak A/T3W on Ford original rims. A common spare wheel is used for both car and trailer.
-- **Manufacturing Technique:** Custom-built CNC router (PrintNC) is utilized maximally for precision, corner joints, brackets, niches, and modular panels.
+- **Manufacturing Technique:** Custom-built CNC router (PrintNC) is utilized maximally for precision, corner joints, brackets, niches, and modular panels. Additionally, 3D printed guides will be used to ensure precise drilling of holes in the steel beams. A simplified, non-CNC version with cruder geometry will also be provided for builders without access to CNC routing.
 
 ## 1. Chassis & Mechanics
 - **Frame Structure:** Square steel (VKR 50x50x3 or 60x40x3 mm). No full welding to prevent fatigue cracks; the frame is bolted together with through-bolts (M10/M12 in 8.8/10.9 grade).

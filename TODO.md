@@ -3,6 +3,8 @@
 ## Phase 1: Concept & CAD Design
 - [ ] Measure the Ford Ranger to determine optimal track width and drawbar height.
 - [ ] CAD model the base frame (VKR profiles) and define bolt patterns for the corners.
+- [ ] Design 3D printed drill guides to ensure accurate hole placement on the steel beams.
+- [ ] Create a simplified geometry version (non-CNC) for builders without access to a CNC router.
 - [ ] CAD design and simulate the corner reinforcements ("double sandwich") in 8-10 mm aluminum.
 - [ ] Design CNC-milled niches for external electrical and gas outlets.
 - [ ] Design mount/cradle for propane tank on the drawbar (including stone protection).
