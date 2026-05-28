@@ -1,13 +1,13 @@
-# Koncept: El- & Nätverksdragning (Vänster Sida)
+# Concept: Electrical & Network Routing (Left Side)
 
-**Syfte:** Maximera driftsäkerhet, personsäkerhet och signalintegritet genom rigorös separation från gasol, stjärnjordning och smart blottning/inkapsling.
+**Purpose:** Maximize operational reliability, personal safety, and signal integrity through rigorous separation from propane, single-point grounding, and smart exposure/encapsulation.
 
-## Detaljer & Struktur
-- **Stjärnjord (Single-Point Grounding):** Chassit har en central, kraftig bult/plint. Alla delsystem (230V skyddsjord, 12V minus, och utjämningskabel) dras gemensamt hit. Syftet är att undvika krypströmmar och jordslingor. Stålramen ansluts med en 6 mm² gulgrön kabel.
-- **Tunneldesign i Hörnen:** Stålet utgör en pansrad rörgång, men vid varje 90-gradershörn är profilerna igensvetsade (eller bultade tätt). Håltagning med gummigenomföring sker strax *före* hörnen och flexslangen "genar" mjukt inuti dubbelmackan av aluminiumplattor.
-- **Nätverk (RF):** Koaxialkablar (typ LMR-200/400) är känsliga för skarpa böjar och klämskador. Hörngenomföringarna måste ha en noggrant beräknad kurvradie (Bending Radius).
-- **Modulär Power Station:** Designas som en fristående låda. Lådan har stora, kraftiga Anderson-kontakter på utsidan för in/ut. Innehåller 12V batteribank, DC-DC-laddare, MPPT och Noco 230V-laddare. Lådan måste gå att lyfta ur vagnen på 1 minut för vinterförvaring eller användning externt i baslägret.
+## Details & Structure
+- **Single-Point Grounding (Star Grounding):** The chassis features a central, heavy-duty bolt/terminal. All subsystems (230V protective earth, 12V negative, and equipotential bonding) are routed here together. The purpose is to avoid stray currents and ground loops. The steel frame is connected with a 6 mm² yellow/green cable.
+- **Tunnel Design in Corners:** The steel acts as an armored conduit, but at each 90-degree corner, the profiles are welded shut (or bolted tightly). Drilling with a rubber grommet is done just *before* the corners, and the flexible conduit takes a soft "shortcut" inside the double sandwich of aluminum plates.
+- **Network (RF):** Coaxial cables (like LMR-200/400) are sensitive to sharp bends and crush damage. The corner passthroughs must have a carefully calculated bending radius.
+- **Modular Power Station:** Designed as a standalone box. The box has large, heavy-duty Anderson connectors on the outside for in/out. It contains the 12V battery bank, DC-DC charger, MPPT, and Noco 230V charger. The box must be removable from the trailer in 1 minute for winter storage or external use at basecamp.
 
-## Nästa steg
-1. Kissa upp ett formellt elschema (Single Line Diagram) för 12V och 230V.
-2. Designa/CNC-fräsa el-nischen: En nedsänkt modul i vänster Dibond-vägg som snyggt rymmer 230V CEE-intag samt väderskyddade N-kontakter till Poynting-antennen.
+## Next Steps
+1. Sketch out a formal electrical schematic (Single Line Diagram) for 12V and 230V.
+2. Design/CNC mill the electrical niche: A recessed module in the left Dibond wall that neatly houses the 230V CEE inlet and weather-protected N-connectors for the Poynting antenna.

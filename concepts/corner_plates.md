@@ -1,14 +1,14 @@
-# Koncept: Hörnförstärkningar ("Dubbelmacka")
+# Concept: Corner Reinforcements ("Double Sandwich")
 
-**Syfte:** Sammanfoga stålramens hörn på ett extremt starkt och vibrationssäkert sätt utan helsvetsning, vilket förhindrar sprickbildning vid offroad-körning och underlättar varmgalvanisering.
+**Purpose:** Join the corners of the steel frame in an extremely strong and vibration-resistant way without full welding, preventing crack formation during off-road driving and facilitating hot-dip galvanizing.
 
-## Designparametrar (För PrintNC CAD)
-- **Material:** 6082-T6 Aluminium (Tjocklek: 8-10 mm).
-- **Bultmönster:** Designa ett "zick-zack"-mönster (offset) för bultarna för att förhindra försvagning längs en enskild linje i stålprofilen (VKR). Genomgående M10 eller M12 (8.8/10.9).
-- **Bockning/Stagning:** Utöver 90-graders profilen, integrera fästpunkter i plattorna för att fixera flexslangarna i "kabeltunneln" mellan övre och undre aluminiumplatta.
-- **Toleranser:** Fräsningen ska tillåta exakt passform för bultar men även ge mikroskopisk plats för isoleringsfilm (gummi/vinyl) och marinfett (Duralac) mellan stål och aluminium.
+## Design Parameters (For PrintNC CAD)
+- **Material:** 6082-T6 Aluminum (Thickness: 8-10 mm).
+- **Bolt Pattern:** Design a "zig-zag" (offset) pattern for the bolts to prevent weakening along a single line in the steel profile (VKR). Through-bolts M10 or M12 (8.8/10.9).
+- **Routing/Bracing:** In addition to the 90-degree profile, integrate mounting points in the plates to secure the flexible conduits in the "cable tunnel" between the upper and lower aluminum plates.
+- **Tolerances:** The milling must allow for exact fitment of bolts but also provide microscopic space for isolation film (rubber/vinyl) and marine grease (Duralac) between the steel and aluminum.
 
-## Att iterera i CAD
-1. Modellera VKR-stålhörnet och identifiera avstånd och eventuella kollisioner för bultar (glöm inte brickorna).
-2. Skapa negativt utrymme (tunneln) där rör och flexslang tillåts hoppa ur stålprofilen innan 90-graders mötet, och färdas skyddat mellan plattorna. Speciellt viktigt för den känsliga LMR-koaxialkabeln till 5G-antennen som kräver mjuk radie.
-3. FEA-simulera hörnet (statisk last och vridkraft) om möjligt, för att spara vikt i aluminiumplattorna (t.ex. genom att fräsa ut fickor där materialet är överflödigt).
+## CAD Iteration
+1. Model the VKR steel corner and identify distances and potential collisions for bolts (don't forget washers).
+2. Create negative space (the tunnel) where pipes and flexible conduits are allowed to exit the steel profile before the 90-degree junction, traveling protected between the plates. Especially important for the sensitive LMR coaxial cable to the 5G antenna which requires a soft bending radius.
+3. FEA-simulate the corner (static load and torsional force) if possible, to save weight in the aluminum plates (e.g., by milling pockets where material is redundant).
