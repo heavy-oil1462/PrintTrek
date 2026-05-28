@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrintTrek Dashboard</title>
+    <meta name="description" content="Dashboard for the PrintTrek adventure trailer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>PrintTrek <span class="accent">Control</span></h1>
+            <div class="status-indicator">
+                <div id="conn-status" class="dot disconnected"></div>
+                <span id="conn-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="panel sensors-panel">
+                <h2>System Vitals</h2>
+                <div class="sensor-grid">
+                    <div class="sensor-card">
+                        <div class="icon-wrapper water-icon">💧</div>
+                        <div class="sensor-info">
+                            <span class="sensor-label">Water Level</span>
+                            <span class="sensor-value" id="val-water">--%</span>
+                        </div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill water-fill" id="prog-water" style="width: 0%;"></div></div>
+                    </div>
+
+                    <div class="sensor-card">
+                        <div class="icon-wrapper power-icon">⚡</div>
+                        <div class="sensor-info">
+                            <span class="sensor-label">Battery Voltage</span>
+                            <span class="sensor-value" id="val-battery">--V</span>
+                        </div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill power-fill" id="prog-battery" style="width: 0%;"></div></div>
+                    </div>
+
+                    <div class="sensor-card">
+                        <div class="icon-wrapper temp-icon">🌡️</div>
+                        <div class="sensor-info">
+                            <span class="sensor-label">Temperature</span>
+                            <span class="sensor-value" id="val-temp">--°C</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel controls-panel">
+                <h2>Relay Controls</h2>
+                <div class="control-list">
+                    <div class="control-item">
+                        <div class="control-info">
+                            <h3>Water Pump</h3>
+                            <p>12V Galley Pump</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="relay-water_pump">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="control-item">
+                        <div class="control-info">
+                            <h3>Exterior Lights</h3>
+                            <p>Side & Rear LED Floods</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="relay-exterior_lights">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="control-item">
+                        <div class="control-info">
+                            <h3>Combi Fridge</h3>
+                            <p>Dometic 12V Power</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="relay-fridge">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
