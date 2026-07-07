@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 scripts/calculate_tubes.py)",
+      "Bash(python3 scripts/calculate_mass.py)",
+      "Bash(command -v openscad-nightly)",
+      "Bash(command -v nix-shell nix)",
+      "Bash(nix-shell --version)",
+      "Bash(nix-shell -p openscad --run \"openscad --version\")",
+      "Bash(nix-shell -I nixpkgs=channel:nixos-25.05 -p openscad --run \"openscad --version\")",
+      "Bash(nix-shell *)",
+      "Bash(nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A openscad --no-out-link)",
+      "Bash(nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A openscad-unstable --no-out-link)",
+      "Bash(LD_DEBUG=libs /nix/store/p257r2y0182281r3ybj3wxciwx3vw4w6-openscad-unstable-2025-06-04/bin/openscad --version)",
+      "Bash(git -C /workspace status --short)"
+    ]
+  }
+}

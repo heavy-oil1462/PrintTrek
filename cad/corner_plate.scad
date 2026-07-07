@@ -15,7 +15,7 @@ module corner_plate(
     plate_thickness = 10,    // Thickness of the aluminum plate (mm)
     tube_width = 50,         // Width of the VKR profile (steel frame)
     arm_length = 200,        // Total length of the plate arms from the outer corner
-    hole_dia = 10.5,         // Hole diameter for M10 bolts
+    hole_dia = 11,           // Hole diameter for M10 bolts (drilled before galvanizing, reamed clean after — zinc adds ~100 µm per surface)
     outer_radius = 12,       // Rounding of outer corners
     tunnel_curve = 80        // Radius for the inner soft curve (cable shortcut). Also determines offset for perfect tangent.
 ) {

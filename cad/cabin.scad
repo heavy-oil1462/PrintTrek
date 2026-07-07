@@ -8,7 +8,7 @@
  */
 
 frame_length = 2000;
-frame_width = 1400;
+frame_width = 1200; // Matchar frame.scad (smalnad för Rangerns spårvidd)
 cabin_height = 750; // Lägre profil så taktältet hamnar i bra höjd
 pillar_w = 40;      // 40x40 mm fyrkantsrör för karossens skelett
 floor_t = 15;       // Formplyfa i botten

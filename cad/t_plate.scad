@@ -18,7 +18,7 @@ module t_plate(
     rect_max_x = 50,    // For rectangular: front extension (typically covers crossbeam)
     rect_min_y = -65,   // For rectangular: left extension
     rect_max_y = 65,    // For rectangular: right extension
-    hole_dia = 10.5,    // For M10 through-bolts
+    hole_dia = 11,      // For M10 through-bolts (drilled before galvanizing, reamed clean after)
     outer_radius = 12,  // Outer corner radius
     fillet_r = 50       // Radius of the inner corner fillet
 ) {

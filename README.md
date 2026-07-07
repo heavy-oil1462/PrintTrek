@@ -23,12 +23,15 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
   - Dedicated drawbar mount for a 6kg propane cylinder with built-in stone protection.
   - Recessed, milled niches for external water, gas, and power outlets.
   - Modular "Power Station" 12V box, 230V mains integration, and Teltonika 5G network integration.
-- **Slide-Out Kitchen:** Accommodates a heavy-duty drawer (100-150kg slides) for a Dometic combi fridge and stove, fed safely via a flexible cable/gas energy chain.
+- **Slide-Out Kitchen:** Accommodates a heavy-duty drawer (100-150kg slides) for a 12V compressor fridge (e.g., Dometic CFX), fed via an electrical-only energy chain. Propane stays on fixed pipes to external quick-connects for outdoor cooking.
+- **CAN-Bus Control System:** Arduino-based CAN nodes (relays + sensors), a Go backend on a Raspberry Pi, and a web dashboard for monitoring water level, battery voltage, and temperature, and for switching the pump, lights, and fridge remotely.
 
 ## Repository Structure
 
 - `/cad`: Contains all the 3D models and manufacturing files (e.g., OpenSCAD, STEP, or STL files) for the corner plates, niches, and chassis geometry.
 - `/concepts`: Markdown files and diagrams detailing sub-systems (like electrical routing, propane layout, and water flow).
+- `/software`: The trailer control system — Arduino CAN-node firmware, Go backend (WebSocket API + CAN bridge), and web dashboard.
+- `/scripts`: Helper tools — `calculate_tubes.py` (steel cut list from the CAD files) and `calculate_mass.py` (weight, center of gravity, and tongue-load budget).
 - `MATERIALS.md`: A comprehensive Bill of Materials (BOM) detailing the steel, aluminum, fasteners, and specific off-the-shelf components required.
 - `SPECS.md`: The core technical specifications and overarching design decisions.
 - `TODO.md`: The phased checklist of design, purchasing, and construction tasks.
