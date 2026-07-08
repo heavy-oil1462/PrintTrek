@@ -27,15 +27,15 @@ COMPONENTS = [
     # --- Chassis (steel, hot-dip galvanized: raw mass x ~1.06) ---
     ("Side rails 2x 2.0 m VKR 50x50x3 (4.31 kg/m)",   18.3, 1000),
     ("Front crossbeam 1.1 m VKR 50x50x3",              5.0,   25),
-    ("Axle crossbeam 1.1 m VKR 50x50x3",               5.0, AXLE_X),
+    ("Mid crossbeam (drawbar lap) 1.1 m VKR 50x50x3",  5.0,  975),
     ("Rear crossbeam 1.1 m VKR 50x50x3",               5.0, 1975),
-    ("Central drawbar 2.25 m VKR 100x50x4 (8.6 kg/m)", 20.5,  125),
+    ("Central drawbar 2.02 m VKR 100x50x4 (8.6 kg/m)", 18.4,   10),
     ("Coupling head (type-approved) + bolts",           4.0, COUPLING_X),
     ("Crush sleeves, bolts, nuts, washers",             6.0,  900),
 
     # --- Aluminum plates (6082-T6) ---
     ("Corner plates 8x 200x200x10 (1.08 kg ea)",        8.6, 1000),
-    ("T-plates axle beam 4x (~1.5 kg ea)",              6.0, AXLE_X),
+    ("T-plates mid crossbeam 4x (~1.5 kg ea)",          6.0,  975),
     ("Drawbar wedge/spacer plates",                     3.0,  100),
     ("Drawbar angle brackets 2x L80x80x8 x 120 mm",     2.3,   25),
 

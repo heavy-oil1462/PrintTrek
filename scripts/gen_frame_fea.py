@@ -30,7 +30,6 @@ FRAME_W = 1200.0
 AXLE_X = 1200.0
 DRAWBAR_Z = -85.0        # 25 (half tube) + 10 (spacer/cradle web) + 50 (half bar)
 COUPLING_X = -1090.0
-BRACKET_Y = (100.0, 1100.0)   # torsion-axle bracket positions on the axle beam
 DECK_KG = 400.0
 G = 9.81
 
@@ -64,25 +63,33 @@ def beam(p0, p1, nint, elset):
 
 
 # --- geometry (centerlines) -------------------------------------------
+MID_X = 1000.0   # mid crossmember: rear drawbar lap (the beam ends at
+                 # x=1020, short of the axle tube crossing at x 1070-1150)
+
 railL = beam((0, 0, 0), (FRAME_L, 0, 0), 20, "RAILS")
 railR = beam((0, FRAME_W, 0), (FRAME_L, FRAME_W, 0), 20, "RAILS")
 beam((0, 0, 0), (0, FRAME_W, 0), 12, "CROSS")
-beam((AXLE_X, 0, 0), (AXLE_X, FRAME_W, 0), 12, "CROSS")
+beam((MID_X, 0, 0), (MID_X, FRAME_W, 0), 12, "CROSS")
 beam((FRAME_L, 0, 0), (FRAME_L, FRAME_W, 0), 12, "CROSS")
+# No crossbeam over the axle: the bolted torsion-axle tube ties the
+# rails there. Its rail brackets (near x=1100) are the vertical supports.
 beam((COUPLING_X, FRAME_W / 2, DRAWBAR_Z), (0, FRAME_W / 2, DRAWBAR_Z), 20, "DRAWBAR")
-beam((0, FRAME_W / 2, DRAWBAR_Z), (AXLE_X + 50, FRAME_W / 2, DRAWBAR_Z), 14, "DRAWBAR")
-# Lap joints: short stiff links crossbeam centerline -> drawbar centerline
+beam((0, FRAME_W / 2, DRAWBAR_Z), (MID_X, FRAME_W / 2, DRAWBAR_Z), 10, "DRAWBAR")
+beam((MID_X, FRAME_W / 2, DRAWBAR_Z), (MID_X + 20, FRAME_W / 2, DRAWBAR_Z), 2, "DRAWBAR")
+# Lap joints: short links crossbeam centerline -> drawbar centerline.
 # Front lap = the ANGLE-BRACKET pair (2x L80x80x8, see
 # cad/drawbar_angle_joint.scad): modeled as a connector with the two
 # vertical legs lumped into one RECT 120x16 section — its stresses
-# indicate how hard the angles work. Axle lap = plain bolted spacer
-# joint, modeled as a stiff 30x30 connector.
+# indicate how hard the angles work. Rear lap (mid crossmember) = plain
+# bolted spacer joint, modeled as a stiff 30x30 connector.
 beam((0, FRAME_W / 2, 0), (0, FRAME_W / 2, DRAWBAR_Z), 2, "ANGLES")
-beam((AXLE_X, FRAME_W / 2, 0), (AXLE_X, FRAME_W / 2, DRAWBAR_Z), 2, "LAPLINK")
+beam((MID_X, FRAME_W / 2, 0), (MID_X, FRAME_W / 2, DRAWBAR_Z), 2, "LAPLINK")
 
 coupling = nid(COUPLING_X, FRAME_W / 2, DRAWBAR_Z)
-brk1 = nid(AXLE_X, BRACKET_Y[0], 0)
-brk2 = nid(AXLE_X, BRACKET_Y[1], 0)
+# Axle brackets clamp UNDER the rails at the tube (x~1100), not to a
+# crossbeam — support the rail nodes there.
+brk1 = nid(1100, 0, 0)
+brk2 = nid(1100, FRAME_W, 0)
 
 
 def mesh_lines():

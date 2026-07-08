@@ -64,33 +64,40 @@ fiber / clamp line — reading a few % below the hand-calc envelope is
 expected; use the hand calc as the conservative number.
 
 ### frame_global_3g.inp + frame_global_twist.inp — WHOLE CHASSIS
-The entire load-bearing structure in one beam model (rails, three
-crossbeams, drawbar 85 mm below frame plane, lap joints as stiff links).
-Generated parametrically: `python3 scripts/gen_frame_fea.py`.
+The entire load-bearing structure in one beam model: rails, THREE
+crossbeams (front, mid at x 950-1000 for the drawbar lap, rear — no
+beam over the axle, the bolted axle tube ties the rails there), drawbar
+85 mm below the frame plane ending ahead of the axle tube, lap joints
+as connectors. Vertical supports sit on the RAILS at the axle brackets
+(x≈1100). Generated parametrically: `python3 scripts/gen_frame_fea.py`.
 
 The front lap is modeled as the **angle-bracket pair** (2× L80x80x8,
 `cad/drawbar_angle_joint.scad`, vertical legs lumped to a 120×16
-connector); the axle lap as the plain bolted spacer joint.
+connector); the rear lap (mid crossbeam) as the bolted spacer joint.
 
 **LC 3g vertical** (400 kg deck × 3g, supported at coupling + axle
 brackets) — max von Mises per member group:
 
 | Member group | max vM | SF vs 355 |
 |---|---|---|
-| Side rails | 86 MPa | 4.1 |
-| Crossbeams | 87 MPa | 4.1 |
-| Drawbar | 36 MPa | 9.9* |
-| Angle pair (front lap) | 25 MPa | 14 — their governing case is the *lateral* couple (~105 MPa, SF 3.4, `check_angle_joint`), not this vertical LC |
+| Side rails | 130 MPa | 2.7 |
+| Crossbeams | 27 MPa | 13 |
+| Drawbar | 19 MPa | 19* |
+| Angle pair / rear lap | 4 / 34 MPa | their governing case is the *lateral* couple (~118 MPa, SF 3.0, `check_angle_joint`), not this vertical LC |
 
 \* the isolated 3g-tongue cantilever (89 MPa) remains the drawbar's
 governing envelope — dynamic pitching loads the tongue independently of
-the deck.
+the deck. Note the rails took over from the deleted axle crossbeam:
+SF dropped from ~4 to 2.7 in this bounding case (full 400 kg payload at
+3g) — the price of one clean middle beam, still comfortable.
 
 **LC diagonal racking** (three corners held, fourth lifted 30 mm): rails
-64 / crossbeams 60 MPa. The open ladder frame is torsionally soft —
-good off-road, and stresses stay low. (A "one wheel up" case with a ball
-coupling is a near-rigid roll of the whole trailer — verified zero
-stress — because the ball transmits no roll moment.)
+65 / crossbeams 65 / drawbar 24 MPa; the rear-lap connector reads
+81 MPa (load-path indicator for the bolted joint). The open ladder frame
+is torsionally soft — good off-road, and stresses stay low. (A "one
+wheel up" case with a ball coupling is a near-rigid roll of the whole
+trailer — verified zero stress — because the ball transmits no roll
+moment.)
 
 ![Global 3g](frame_global_3g_stress.png)
 ![Global racking](frame_global_twist_stress.png)

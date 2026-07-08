@@ -1,36 +1,36 @@
 // cad/cabin.scad
 /*
- * Offroad Adventure Trailer - Expedition Canopy (För Taktält)
+ * Offroad Adventure Trailer - Expedition Canopy (for a roof tent)
  *
- * En solid lådstruktur (canopy) byggd av ett inre ramverk och täckt 
- * med aluminium/plyfa-skivor på sidor, golv och tak.
- * Designad med takräcken för att bära ett taktält i linje med bilens takhöjd.
+ * A solid box structure (canopy) built from an inner skeleton and clad
+ * with aluminum/plywood sheets on the sides, floor and roof.
+ * Designed with roof racks to carry a roof tent level with the car.
  */
 
 frame_length = 2000;
-frame_width = 1200; // Matchar frame.scad (smalnad för Rangerns spårvidd)
-cabin_height = 750; // Lägre profil så taktältet hamnar i bra höjd
-pillar_w = 40;      // 40x40 mm fyrkantsrör för karossens skelett
-floor_t = 15;       // Formplyfa i botten
-wall_t = 3;         // Dibond / Aluminium / Plywood för väggarna
+frame_width = 1200; // Matches frame.scad (narrowed for the Ranger's track)
+cabin_height = 750; // Low profile so the roof tent lands at a good height
+pillar_w = 40;      // 40x40 mm square tube for the body skeleton
+floor_t = 15;       // Form plywood floor
+wall_t = 3;         // Dibond / aluminum / plywood walls
 
 module canopy_skeleton() {
     color("silver") {
-        // Hörnstolpar (Vertikala balkar)
+        // Corner pillars (vertical)
         translate([0, 0, 0]) cube([pillar_w, pillar_w, cabin_height]);
         translate([frame_length - pillar_w, 0, 0]) cube([pillar_w, pillar_w, cabin_height]);
         translate([0, frame_width - pillar_w, 0]) cube([pillar_w, pillar_w, cabin_height]);
         translate([frame_length - pillar_w, frame_width - pillar_w, 0]) cube([pillar_w, pillar_w, cabin_height]);
-        
-        // Mittenstolpar (Förhindrar svikt när man sover i tältet)
+
+        // Mid pillars (prevent sag when sleeping in the tent)
         translate([frame_length/2 - pillar_w/2, 0, 0]) cube([pillar_w, pillar_w, cabin_height]);
         translate([frame_length/2 - pillar_w/2, frame_width - pillar_w, 0]) cube([pillar_w, pillar_w, cabin_height]);
-        
-        // Takbalkar (Långsidor)
+
+        // Roof beams (long sides)
         translate([0, 0, cabin_height - pillar_w]) cube([frame_length, pillar_w, pillar_w]);
         translate([0, frame_width - pillar_w, cabin_height - pillar_w]) cube([frame_length, pillar_w, pillar_w]);
-        
-        // Takbalkar (Kortsidor och mitten)
+
+        // Roof beams (short sides and middle)
         translate([pillar_w, 0, cabin_height - pillar_w]) cube([pillar_w, frame_width, pillar_w]);
         translate([frame_length/2 - pillar_w/2, 0, cabin_height - pillar_w]) cube([pillar_w, frame_width, pillar_w]);
         translate([frame_length - 2*pillar_w, 0, cabin_height - pillar_w]) cube([pillar_w, frame_width, pillar_w]);
@@ -38,74 +38,75 @@ module canopy_skeleton() {
 }
 
 module roof_racks() {
-    // Tvärgående räcken/lastbågar (Crossbars) monterade på taket
+    // Transverse crossbars mounted on the roof
     color("black") {
-        // Främre räcke
+        // Front bar
         translate([frame_length*0.2, -50, cabin_height]) cube([40, frame_width + 100, 30]);
-        // Bakre räcke
+        // Rear bar
         translate([frame_length*0.8, -50, cabin_height]) cube([40, frame_width + 100, 30]);
     }
 }
 
 module trailer_cabin() {
-    // 1. Botten (15mm formplyfa eller liknande)
-    color("SaddleBrown") 
+    // 1. Floor (15 mm form plywood or similar)
+    color("SaddleBrown")
         translate([0, 0, 50]) cube([frame_length, frame_width, floor_t]);
-        
-    // 2. Ramverket (Skelettet av 40x40 balkar)
+
+    // 2. Skeleton (40x40 beams)
     translate([0, 0, 50 + floor_t])
         canopy_skeleton();
-        
-    // 3. Takräcken (Räcken som tältet monteras i)
+
+    // 3. Roof racks (the tent mounts to these)
     translate([0, 0, 50 + floor_t])
         roof_racks();
-        
-    // 4. Väggar och Takskivor (Viss transparens för att se ramen)
+
+    // 4. Walls and roof sheets (semi-transparent to show the skeleton)
     color("WhiteSmoke", 0.8) {
-        // Vänster vägg (köksutdrag + förrådsskåpslucka)
+        // Left wall (kitchen drawer opening + storage cabinet door)
         difference() {
             translate([0, -wall_t, 50 + floor_t]) cube([frame_length, wall_t, cabin_height]);
-            // Öppning för kökslådan (front vänster, drar ut i sidled)
+            // Opening for the kitchen drawer (front left, pulls out sideways)
             translate([60, -wall_t - 1, 50 + floor_t]) cube([520, wall_t + 2, 330]);
-            // Öppning för förrådsskåpets lucka (bakom kökslådan)
+            // Opening for the storage cabinet door (behind the kitchen drawer)
             translate([780, -wall_t - 1, 50 + floor_t + 50]) cube([460, wall_t + 2, 400]);
         }
-        // Förrådsskåpslucka (gångjärn i framkant, visas stängd)
+        // Storage cabinet door (hinged at the front edge, shown closed)
         color("Gainsboro")
             translate([782, -wall_t, 50 + floor_t + 52]) cube([456, wall_t, 396]);
 
-        // Höger vägg (el-nisch + lucka till elfacket — allt elektriskt
-        // sitter på höger sida, framför kyllådan)
+        // Right wall (el-niche + electrical bay door - all electrical
+        // lives on the right side, ahead of the fridge drawer)
         difference() {
             translate([0, frame_width, 50 + floor_t]) cube([frame_length, wall_t, cabin_height]);
-            // Urtag för el-nischen (Y stämmer med main_assembly placering)
+            // Cutout for the electrical niche (Y matches main_assembly placement)
             translate([600, frame_width - 1, 50 + floor_t + 200]) cube([160, wall_t + 2, 200]);
-            // Öppning för elfackets lucka (batteribox/central lyfts ut här)
+            // Opening for the electrical bay door (battery box lifts out here)
             translate([780, frame_width - 1, 50 + floor_t + 50]) cube([460, wall_t + 2, 400]);
         }
-        // Elfackslucka (visas stängd)
+        // Electrical bay door (shown closed)
         color("Gainsboro")
             translate([782, frame_width, 50 + floor_t + 52]) cube([456, wall_t, 396]);
-        
-        // Framvägg
+
+        // Front wall
         translate([-wall_t, 0, 50 + floor_t]) cube([wall_t, frame_width, cabin_height]);
-        
-        // Bakvägg (baklucka ned till golvnivå så kyllådan kan dras ut)
+
+        // Rear wall (tailgate opening down to floor level so the fridge
+        // drawer can slide out)
         difference() {
             translate([frame_length, 0, 50 + floor_t]) cube([wall_t, frame_width, cabin_height]);
-            // Urtag för bakluckan — tröskelfritt vid golvet för kylsläden
+            // Tailgate cutout - sill-free at the floor for the fridge sled
             translate([frame_length - 1, 100, 50 + floor_t]) cube([wall_t + 2, frame_width - 200, cabin_height - 150]);
         }
-        
-        // Taket
+
+        // Roof
         translate([0, 0, 50 + floor_t + cabin_height - wall_t]) cube([frame_length, frame_width, wall_t]);
     }
-    
-    // 5. Visuellt taktält (Mockup i stängt/ihopfällt läge)
+
+    // 5. Visual roof tent (mockup, closed/folded state)
     color("DarkOliveGreen", 0.95)
     translate([frame_length*0.1, 100, 50 + floor_t + cabin_height + 30])
         cube([frame_length*0.8, frame_width - 200, 300]);
 }
 
-// Renderas om filen öppnas separat
+// Renders if the file is opened standalone
 trailer_cabin();

@@ -2,7 +2,7 @@
 
 ![Chassis — the load-bearing core](chassis.png)
 
-*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a single central VKR 100×50×4 drawbar lapped under the frame to the axle crossbeam, and a braked torsion axle matching the Ford Ranger's 1560 mm track. Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
+*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a single central VKR 100×50×4 drawbar lapped under the frame to a mid crossmember (clamped at the front, through-bolted at the rear), and a braked torsion axle matching the Ford Ranger's 1560 mm track. Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
 
 ## Structural Analysis
 

@@ -45,7 +45,8 @@
       "Bash(python3 scripts/gen_frame_fea.py)",
       "Bash(./scripts/render_scad.sh cad/main_assembly.scad /dev/null)",
       "Bash(sed -n '/ANGLE-BRACKET/,/interface/p')",
-      "Bash(./scripts/render_scad.sh cad/drawbar_angle_joint.scad drawbar_angle_joint.png)"
+      "Bash(./scripts/render_scad.sh cad/drawbar_angle_joint.scad drawbar_angle_joint.png)",
+      "Bash(git rm *)"
     ]
   }
 }

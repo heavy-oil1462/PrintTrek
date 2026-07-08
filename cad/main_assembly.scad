@@ -38,15 +38,17 @@ drawer_pullout = 300;      // Kitchen drawer extension for visualization (mm)
 
 // --- Drawbar geometry (must match frame.scad) ---
 // Single central beam, VKR 100x50x4 standing on edge, lapped under the
-// frame back to the axle crossbeam. Sizing math in frame.scad.
+// frame back to the mid crossbeam (x 950-1000). Sizing math in frame.scad.
 drawbar_reach = 1000;
 bar_w = 50;
 bar_h = 100;
 
 // --- Axle/wheel geometry (must match wheel_axle.scad) ---
-// axle_x = the axle crossbeam AND the wheel-center line (AXLE_X in the
-// mass budget). The torsion-axle TUBE sits trail=90 mm ahead of it so
-// the trailing-arm hubs land exactly here.
+// axle_x = the wheel-center line (AXLE_X in the mass budget). The
+// torsion-axle TUBE sits trail=90 mm ahead of it so the trailing-arm
+// hubs land exactly here. No frame crossbeam over the axle: the bolted
+// axle tube ties the rails; the mid crossbeam (950-1000) is the frame's
+// one middle beam.
 axle_x = frame_length * 0.6;
 trail = 90;
 hub_x = axle_x;
@@ -123,22 +125,24 @@ translate([frame_length, frame_width, -plate_thickness]) rotate([0, 0, 180]) pla
 // in scripts/beam_check.py (check_joint_hole / check_angle_joint).
 translate([tube_w/2, frame_width/2, 0]) drawbar_angle_joint();
 
-// AXLE crossbeam: plain through-bolted lap + 10 mm spacer (bending
-// moment ~zero here; the through-bolt gives positive longitudinal
-// location). drawbar_wedge_plate.scad remains for the V-drawbar
-// alternative.
+// MID crossbeam (x 950-1000): plain through-bolted rear lap + 10 mm
+// spacer (bending moment ~zero here; the through-bolt gives positive
+// longitudinal location). The beam ends at x=1020, short of the
+// torsion-axle tube (x 1070-1150) which crosses at the same depth.
+// drawbar_wedge_plate.scad remains for the V-drawbar alternative.
 color("gold")
-    translate([frame_length*0.6, frame_width/2 - bar_w/2, -plate_thickness])
+    translate([950, frame_width/2 - bar_w/2, -plate_thickness])
         cube([tube_w, bar_w, plate_thickness]);
 
-// 3.6 T-plates for Center Beam (Torsion Axle)
+// 3.6 T-plates for the mid crossbeam (x 950-1000: drawbar rear lap +
+// rail tie ahead of the axle — the one middle beam of the frame)
 // Left side
-translate([frame_length*0.6 - tube_w/2, tube_w, tube_w]) rotate([0, 0, -90]) place_t_plate();
-translate([frame_length*0.6 - tube_w/2, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
+translate([975, tube_w, tube_w]) rotate([0, 0, -90]) place_t_plate();
+translate([975, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
 
 // Right side
-translate([frame_length*0.6 - tube_w/2, frame_width - tube_w, tube_w]) rotate([0, 0, 90]) place_t_plate();
-translate([frame_length*0.6 - tube_w/2, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
+translate([975, frame_width - tube_w, tube_w]) rotate([0, 0, 90]) place_t_plate();
+translate([975, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
 
 // ==========================================
 // 4. Body / Canopy

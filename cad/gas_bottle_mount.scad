@@ -1,55 +1,56 @@
 /*
- * Offroad Adventure Trailer - Vagga för Gasolflaska (P6/PK6)
+ * Offroad Adventure Trailer - Cradle for the Propane Bottle (P6/PK6)
  *
- * Denna vagga CNC-fräses i 12-15 mm formplyfa eller tjock aluminiumplåt och 
- * monteras på V-dragstången (A-frame).
- * Inkluderar infällda spår för heavy-duty spännband och avrinningshål.
+ * This cradle is CNC-milled from 12-15 mm form plywood or thick aluminum
+ * plate and mounts on the drawbar, flush against the front wall.
+ * Includes recessed slots for heavy-duty straps and a drain hole.
  */
 
-plate_thickness = 12;      // Materialtjocklek
-bottle_dia = 300;          // Diametern på en P6-flaska
-cradle_margin = 40;        // Extramarginal runt om flaskan
-strap_width = 32;          // Bredd på spännbandets genomföring
-strap_thickness = 6;       // Tjocklek/höjd på bandets hål
+plate_thickness = 12;      // Material thickness
+bottle_dia = 300;          // Diameter of a P6 bottle
+cradle_margin = 40;        // Extra margin around the bottle
+strap_width = 32;          // Width of the strap pass-through
+strap_thickness = 6;       // Thickness/height of the strap slot
 
 $fn = 100;
 
 module gas_bottle_cradle() {
     difference() {
-        // 1. Huvudplattan (mjukt rundad rektangel)
+        // 1. Main plate (softly rounded rectangle)
         translate([0, 0, plate_thickness/2])
             minkowski() {
                 cube([bottle_dia + cradle_margin, bottle_dia + cradle_margin, plate_thickness/2], center=true);
                 cylinder(r=20, h=plate_thickness/2, center=true);
             }
-            
-        // 2. Försänkt spår för gasolflaskans bottenring
-        // P6-flaskan har en bottenring som håller fast den. Om vi gör en urgröpning står den stadigt.
+
+        // 2. Recessed groove for the bottle's base ring
+        // The P6 bottle has a bottom ring that locates it. A recess
+        // makes it sit firmly.
         translate([0, 0, plate_thickness - 5])
             difference() {
                 cylinder(d=290, h=10);
-                // Behåll mitten intakt
+                // Keep the center intact
                 translate([0, 0, -1]) cylinder(d=270, h=12);
             }
-            
-        // 3. Stort avrinningshål i mitten (släpper igenom smuts och vatten)
+
+        // 3. Large drain hole in the center (lets dirt and water through)
         translate([0, 0, -1])
             cylinder(d=150, h=plate_thickness + 2);
-            
-        // 4. Urtag för spännband (4 st runt om för att korsspänna flaskan)
+
+        // 4. Strap slots (4x around the bottle for cross-lashing)
         for(angle = [0, 90, 180, 270]) {
             rotate([0, 0, angle])
                 translate([0, bottle_dia/2 + 10, -1])
-                // Förskjut Z marginellt för att garantera hål igenom
+                // Slight Z offset to guarantee a through cut
                 cube([strap_width, strap_thickness, (plate_thickness + 2) * 2], center=true);
         }
-        
-        // 5. Monteringshål (generiska slitsar för U-bultar mot runda/fyrkantiga dragstångsrör)
+
+        // 5. Mounting holes (generic slots for U-bolts around round/square drawbar tubes)
         for(x = [-90, 90]) {
             for(y = [-120, 120]) {
                 translate([x, y, -1])
                     hull() {
-                        translate([0, 15, 0]) cylinder(d=11, h=plate_thickness + 2); // För M10 U-bult
+                        translate([0, 15, 0]) cylinder(d=11, h=plate_thickness + 2); // For M10 U-bolt
                         translate([0, -15, 0]) cylinder(d=11, h=plate_thickness + 2);
                     }
             }
@@ -57,17 +58,17 @@ module gas_bottle_cradle() {
     }
 }
 
-// Rendera vaggan
+// Render the cradle
 gas_bottle_cradle();
 
-// Visualisering av gasolflaskan (transparent)
+// Visualize the propane bottle (transparent)
 %translate([0, 0, plate_thickness]) {
     color("orange", 0.7) {
-        // Flaskkroppen
+        // Bottle body
         cylinder(d=300, h=350);
-        // Flaskhalsen
+        // Bottle neck
         translate([0, 0, 350]) cylinder(d1=300, d2=100, h=100);
-        // Ventilen/Kranskyddet på toppen
+        // Valve/crown guard on top
         translate([0, 0, 450]) cylinder(d=100, h=50);
     }
 }

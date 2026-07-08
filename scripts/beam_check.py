@@ -41,12 +41,16 @@ FUB_8_8 = 800.0
 TOTAL_MASS = 800.0        # kg, registered design weight
 TONGUE_MASS = 80.0        # kg, static tongue load (target 5-10 % of total)
 LEVER_VERT = 1.09         # m, coupling -> front crossbeam support
-LAP_BASE = 1.20           # m, drawbar lap: front crossbeam -> axle crossbeam
+LAP_BASE = 0.95           # m, drawbar lap: front crossbeam -> mid crossmember
+                          # (the beam stops short of the axle tube, so the
+                          # rear lap sits at x~975, not at the axle beam)
 DYN_VERT = 3.0            # g, vertical dynamic factor (off-road)
 DYN_LAT = 0.3             # g, lateral factor on total mass at the coupling
 
 FRAME_PAYLOAD = 400.0     # kg carried on the frame deck (body+cargo, no axle/drawbar)
-RAIL_SPAN = 1.20          # m, side-rail span front crossbeam -> axle crossbeam
+RAIL_SPAN = 1.20          # m, governing side-rail span (front crossbeam ->
+                          # axle-bracket support; mid crossbeam is a tie,
+                          # not a vertical support)
 
 
 # ----------------------------------------------------------------------
@@ -142,9 +146,9 @@ def check_drawbar(profile: RHS):
 
 def check_side_rail(profile: RHS):
     # Each rail carries half the deck payload as a UDL; governing span is
-    # front crossbeam -> axle crossbeam (rear of frame is a cantilever with
-    # less moment). Simply-supported is conservative vs. the real continuous
-    # beam over three supports.
+    # front crossbeam -> axle-bracket support (rear of frame is a cantilever
+    # with less moment). Simply-supported is conservative vs. the real
+    # continuous beam.
     w = (FRAME_PAYLOAD / 2.0) * DYN_VERT * G / 2.0   # N/m over the 2 m rail
     M = w * RAIL_SPAN**2 / 8.0
     s = M * 1e3 / profile.W("strong")
