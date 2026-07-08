@@ -90,12 +90,13 @@ module trailer_cabin() {
         // Front wall
         translate([-wall_t, 0, 50 + floor_t]) cube([wall_t, frame_width, cabin_height]);
 
-        // Rear wall (tailgate opening down to floor level so the fridge
-        // drawer can slide out)
+        // Rear wall: SOLID except a fridge-sized hatch on the rear RIGHT
+        // (the fridge drawer at y 640-1090 slides out through it,
+        // sill-free at the floor). The rear left is closed.
         difference() {
             translate([frame_length, 0, 50 + floor_t]) cube([wall_t, frame_width, cabin_height]);
-            // Tailgate cutout - sill-free at the floor for the fridge sled
-            translate([frame_length - 1, 100, 50 + floor_t]) cube([wall_t + 2, frame_width - 200, cabin_height - 150]);
+            // Fridge hatch: 500 wide x 520 tall, clears tray + fridge lid
+            translate([frame_length - 1, 620, 50 + floor_t]) cube([wall_t + 2, 500, 520]);
         }
 
         // Roof

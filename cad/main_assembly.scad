@@ -17,7 +17,7 @@ use <fender.scad>
 use <water_tank.scad>
 use <kitchen_drawer.scad>
 use <road_equipment.scad>
-use <gas_bottle_mount.scad>
+use <gas_box.scad>
 use <battery_box.scad>
 use <drawbar_angle_joint.scad>
 
@@ -180,13 +180,12 @@ if (show_equipment) {
     // was [780, 330] offset left). Model kept in cad/water_tank.scad;
     // mass stays as a placeholder in scripts/calculate_mass.py.
 
-    // Gas bottle cradle on the drawbar, FLUSH against the front wall
-    // (bottle edge ~45 mm from the wall; the stone guard wraps the front)
-    translate([-210, frame_width/2, -plate_thickness]) gas_bottle_cradle();
-    %translate([-210, frame_width/2, 2]) color("orange", 0.6) {
-        cylinder(d=300, h=350);
-        translate([0, 0, 350]) cylinder(d1=300, d2=100, h=100);
-    }
+    // Caravan-style gas locker box on the drawbar, flush against the
+    // front wall (box rear face ~25 mm from the wall). Houses the P6
+    // bottle + regulator; low-level vents per EN 1949; clamped to the
+    // beam — no holes in the drawbar. Replaces the open cradle + stone
+    // guard (cad/gas_bottle_mount.scad kept as the budget alternative).
+    translate([-230, frame_width/2, -plate_thickness]) gas_box();
 
     // --- Layout (sides in TRAVEL direction; y=0 is the left wall) ---
     // LEFT,  front -> rear: kitchen side-drawer | storage cabinet (utensils)
@@ -241,9 +240,8 @@ if (show_equipment) {
     translate([-800, frame_width/2, -plate_thickness])
         jockey_wheel();
 
-    // Spare wheel on the LEFT half of the tailgate (swings with the
-    // hatch). It cannot sit centered — the fridge drawer exits through
-    // the rear right. Alternative if hatch hinges can't take 32 kg:
-    // roof rack, forward of the tent.
-    translate([2003 + 265/2, 390, 420]) rotate([0, 0, 90]) wheel();
+    // NO spare wheel on the trailer: the wheel spec matches the Ford
+    // Ranger exactly (6x139.7, 265/60R18 on original rims), so the
+    // car's underslung spare serves both. That IS the shared-spare
+    // design goal — and it frees the tailgate for the fridge drawer.
 }

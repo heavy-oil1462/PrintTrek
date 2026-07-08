@@ -61,7 +61,7 @@ Notes learned the hard way (do not rediscover these):
 - Drawbar is a SINGLE central beam, VKR 100x50x4 standing on edge (~1000 mm reach), lapped under the frame to the MID crossmember (x 950-1000) and ending at x=1020 — it must NOT reach the torsion-axle tube (x 1070-1150, same depth). Front lap = angle-bracket clamp, rear lap = through-bolt. Sizing in frame.scad header and scripts/beam_check.py. (The V/A-frame is a preserved alternative, `drawbar_wedge_plate.scad`.)
 - Zig-zag (offset) bolt patterns along tubes — never a straight line of holes.
 - Gas stays right side / electrical left side; the corner "cable tunnel" radius must stay ≥ the LMR coax bend radius (~80 mm). One documented exception: the 230V CEE inlet on the front wall's right half (high), >500 mm from gas equipment.
-- Left-side galley order (front → rear): kitchen side-drawer (out through the left wall), storage cabinet with the power-station box, fridge drawer out the rear hatch (hatch is sill-free at floor level).
+- Galley order: LEFT front → rear: kitchen side-drawer (out through the left wall), storage cabinet. RIGHT: electrical bay, then fridge drawer out through a fridge-sized hatch on the rear RIGHT (500x520, sill-free at the floor) — the rest of the rear wall is solid. No spare wheel on the trailer (the Ranger's serves both).
 
 ## Report
 

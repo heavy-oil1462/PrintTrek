@@ -42,7 +42,6 @@ COMPONENTS = [
     # --- Running gear ---
     ("Torsion axle, braked, 6x139.7 + dampers",        75.0, AXLE_X),
     ("Wheels 2x 265/60R18 on Ranger rims (~32 kg)",    64.0, AXLE_X),
-    ("Spare wheel (rear mount)",                       32.0, 1900),
     ("Fenders + brackets",                              6.0, AXLE_X),
     ("Jockey wheel",                                    5.0, -800),
 
@@ -54,10 +53,14 @@ COMPONENTS = [
     ("Roof racks + roof tent",                         70.0, 1000),
 
     # --- Water (PLACEHOLDER: tank removed from the CAD assembly while
-    #     the mounting is reworked; keep the mass here at the candidate
-    #     position so the tongue budget stays honest) ---
-    ("Water tank 40 L FULL + tank (mounting TBD)",     45.0,  780),
-    ("Skid plate 3 mm alu tread (mounting TBD)",        6.5,  780),
+    #     the mounting is reworked. Candidate spot: BEHIND the axle,
+    #     centered (x~1400) — freed up when the spare wheel left the
+    #     trailer; no drawbar down there (beam ends at 1020) and it
+    #     pulls the tongue back into the window with the gas box up
+    #     front. Note: tongue RISES as water is consumed - see the
+    #     dry-tank line in the output.) ---
+    ("Water tank 40 L FULL + tank (mounting TBD)",     45.0, 1400),
+    ("Skid plate 3 mm alu tread (mounting TBD)",        6.5, 1400),
     ("Pump, hoses, filler, drain valve",                4.0, 1200),
 
     # --- Electrical (right side, bay ahead of the fridge drawer) ---
@@ -67,8 +70,8 @@ COMPONENTS = [
     ("Teltonika router, antenna, coax",                 3.0,  600),
 
     # --- Gas (right side / drawbar) ---
-    ("Propane P6 bottle FULL (6 kg gas + steel)",      14.0, -210),
-    ("Cradle, stone guard, straps",                     7.0, -210),
+    ("Propane P6 bottle FULL (6 kg gas + steel)",      14.0, -230),
+    ("Gas locker box + bearers/clamps (caravan style)", 10.0, -230),
     ("Gas piping, quick-connects, niches",              4.0, 1400),
 
     # --- Galley (kitchen/storage LEFT, electrical bay/fridge RIGHT) ---
@@ -116,13 +119,26 @@ def main():
     else:
         print(f"  [ok] Within assumed axle rating ({AXLE_RATING} kg — update to the purchased axle).")
 
-    pct = 100 * tongue / total
-    if not (5 <= pct <= 10):
-        print(f"  [!] Tongue load {pct:.1f}% is outside the 5-10% target — move the axle or heavy components.")
-    else:
-        print(f"  [ok] Tongue load within 5-10% target.")
+    # Tongue with the water tank EMPTY (worst case moves as the tank is
+    # consumed; water sits behind the axle, so draining RAISES the tongue)
+    dry = [(n, m, x) for n, m, x in COMPONENTS if "Water tank" not in n]
+    total_d = sum(m for _, m, _ in dry)
+    tongue_d = sum(m * (AXLE_X - x) for _, m, x in dry) / (AXLE_X - COUPLING_X)
+    print(f"  Tongue load (water empty):        {tongue_d:6.1f} kg ({100*tongue_d/total_d:.1f}%)")
 
-    if tongue > 100:
+    # Target: 5-10% classic guidance; up to ~12% is fine (and stability-
+    # positive) as long as the coupling S-value and the Ranger's rated
+    # ball load are respected.
+    for label, t, tot in (("full", tongue, total), ("water empty", tongue_d, total_d)):
+        pct = 100 * t / tot
+        if pct > 12 or pct < 5:
+            print(f"  [!] Tongue ({label}) {pct:.1f}% outside 5-12% — move the axle or heavy components.")
+        elif pct > 10:
+            print(f"  [i] Tongue ({label}) {pct:.1f}% — above the classic 10%, OK if within the coupling S-value / towbar ball rating.")
+        else:
+            print(f"  [ok] Tongue ({label}) {pct:.1f}% within the 5-10% target.")
+
+    if max(tongue, tongue_d) > 100:
         print(f"  [!] Check the Ford Ranger towbar's rated ball load (typical 75-100 kg for EU spec).")
 
 

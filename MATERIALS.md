@@ -7,8 +7,8 @@
 - **Crush Sleeves:** Internal steel sleeves for every through-bolt (precision tube, e.g., 16x2.5 mm ID 11 for M10; 20x3 mm for M12), cut to the inner width of the VKR profile — required to reach full bolt preload without collapsing the 3 mm tube walls.
 - **Galvanic Corrosion Insulation:** Duralac anodic paste; optionally 0.5-1 mm G10/FR4 sheet as a rigid isolator. (No rubber/vinyl shims in structural joints — elastomers creep and kill bolt preload.)
 - **Wheels & Axle:** Braked torsion axle (overrun brakes, e.g., Knott/AL-KO) with 6x139.7 bolt pattern + shock absorber (damper) kit + matching overrun coupling with breakaway cable.
-- **Tires/Rims:** Falken Wildpeak A/T3W 265/60R18 on Ford Ranger original rims (x3 incl. spare).
-- **Drawbar & Protection:** Bent aluminum tread plate for stone protection, heavy-duty straps for propane.
+- **Tires/Rims:** Falken Wildpeak A/T3W 265/60R18 on Ford Ranger original rims (x2 — no spare on the trailer; the Ranger's underslung spare serves both).
+- **Gas Locker Box:** Caravan-style drawbar box for the P6 bottle (off-the-shelf poly, Fiamma/Thule class, or CNC-folded aluminum tread plate), with low-level ventilation per EN 1949, lockable lid, internal strap points; 2x aluminum bearers + U-straps to clamp it around the drawbar (no holes in the beam).
 - **Drawbar Joint (front crossbeam):** 2x steel angle L80x80x8 (S355), 120 mm long, hot-dip galvanized — clamp joint, no holes in the beam flanges. (Alternatives: CNC-milled 6082-T6 cradle, or M12 square U-bolts + top plate.)
 
 ## Electrical System & Electronics (Left Side)
