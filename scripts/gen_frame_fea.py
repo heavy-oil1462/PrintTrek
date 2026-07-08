@@ -72,8 +72,13 @@ beam((FRAME_L, 0, 0), (FRAME_L, FRAME_W, 0), 12, "CROSS")
 beam((COUPLING_X, FRAME_W / 2, DRAWBAR_Z), (0, FRAME_W / 2, DRAWBAR_Z), 20, "DRAWBAR")
 beam((0, FRAME_W / 2, DRAWBAR_Z), (AXLE_X + 50, FRAME_W / 2, DRAWBAR_Z), 14, "DRAWBAR")
 # Lap joints: short stiff links crossbeam centerline -> drawbar centerline
-beam((0, FRAME_W / 2, 0), (0, FRAME_W / 2, DRAWBAR_Z), 2, "LINKS")
-beam((AXLE_X, FRAME_W / 2, 0), (AXLE_X, FRAME_W / 2, DRAWBAR_Z), 2, "LINKS")
+# Front lap = the ANGLE-BRACKET pair (2x L80x80x8, see
+# cad/drawbar_angle_joint.scad): modeled as a connector with the two
+# vertical legs lumped into one RECT 120x16 section — its stresses
+# indicate how hard the angles work. Axle lap = plain bolted spacer
+# joint, modeled as a stiff 30x30 connector.
+beam((0, FRAME_W / 2, 0), (0, FRAME_W / 2, DRAWBAR_Z), 2, "ANGLES")
+beam((AXLE_X, FRAME_W / 2, 0), (AXLE_X, FRAME_W / 2, DRAWBAR_Z), 2, "LAPLINK")
 
 coupling = nid(COUPLING_X, FRAME_W / 2, DRAWBAR_Z)
 brk1 = nid(AXLE_X, BRACKET_Y[0], 0)
@@ -84,7 +89,7 @@ def mesh_lines():
     out = ["*NODE, NSET=NALL"]
     for i, (x, y, z) in enumerate(coords, 1):
         out.append(f"{i}, {x}, {y}, {z}")
-    for elset in ("RAILS", "CROSS", "DRAWBAR", "LINKS"):
+    for elset in ("RAILS", "CROSS", "DRAWBAR", "ANGLES", "LAPLINK"):
         out.append(f"*ELEMENT, TYPE=B32R, ELSET={elset}")
         for i, (es, conn) in enumerate(elements, 1):
             if es == elset:
@@ -97,8 +102,12 @@ def mesh_lines():
             "50., 50., 3., 3., 3., 3.", "0., 0., 1.",
             "*BEAM SECTION, ELSET=DRAWBAR, MATERIAL=S355, SECTION=BOX",
             "50., 100., 4., 4., 4., 4.", "0., 1., 0.",
-            # links = the bolted lap itself, modeled stiff (solid 30x30)
-            "*BEAM SECTION, ELSET=LINKS, MATERIAL=S355, SECTION=RECT",
+            # front lap: angle pair L80x80x8 — two 120x8 vertical legs
+            # lumped to RECT 120(x) x 16(y); stresses ~ angle loading
+            "*BEAM SECTION, ELSET=ANGLES, MATERIAL=S355, SECTION=RECT",
+            "120., 16.", "1., 0., 0.",
+            # axle lap: plain bolted spacer joint, stiff 30x30 connector
+            "*BEAM SECTION, ELSET=LAPLINK, MATERIAL=S355, SECTION=RECT",
             "30., 30.", "1., 0., 0."]
     return out
 
@@ -119,7 +128,7 @@ lc_3g = ["** LC: 3g vertical, 400 kg deck payload spread over both rails.",
          "*BOUNDARY",
          f"{coupling}, 1, 3", f"{brk1}, 3, 3", f"{brk2}, 3, 3", f"{brk1}, 2, 2",
          "*STEP", "*STATIC", "*CLOAD"]
-EL_PRINT = [x for g in ("RAILS", "CROSS", "DRAWBAR", "LINKS")
+EL_PRINT = [x for g in ("RAILS", "CROSS", "DRAWBAR", "ANGLES", "LAPLINK")
             for x in (f"*EL PRINT, ELSET={g}", "S")]
 
 lc_3g += [f"{n}, 3, {F:.3f}" for n in rail_nodes]

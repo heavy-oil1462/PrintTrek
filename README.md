@@ -10,12 +10,12 @@ Hand-calcs (`python3 scripts/beam_check.py`) + CalculiX FEA, both validated agai
 
 | | |
 |---|---|
+| ![Whole chassis, 3g](fea/frame_global_3g_stress.png) | ![Whole chassis, racking](fea/frame_global_twist_stress.png) |
+| **Whole chassis, 3g deck load** — rails 86 / crossbeams 87 / drawbar 36 MPa, **SF ≥ 4 on every member**; front lap modeled as the L80×80×8 angle pair (25 MPa here — its governing case is the lateral couple, SF 3.4) | **Whole chassis, diagonal racking** (one corner lifted 30 mm) — 64/60 MPa; the bolted ladder frame is torsionally soft, which is what you want off-road |
 | ![Drawbar FEA](fea/drawbar_cantilever_stress.png) | ![Corner plate FEA](fea/corner_plate_bending_stress.png) |
 | **Drawbar** (steel, 3g tongue load): 85 MPa at the root, SF ≈ 4 on yield — matches the hand calc | **Corner plate** (aluminum, prying bound): 106 MPa at the clamp line, SF ≈ 2.5 even with one plate taking the full couple |
 
-The fatigue-governing detail is not the beam but the bolt hole at the front crossbeam lap (`check_joint_hole` in `beam_check.py`) — `cad/drawbar_cradle.scad` is a milled clamp-cradle that eliminates that hole entirely.
-
-There is also a **whole-chassis model** (`scripts/gen_frame_fea.py` → `fea/frame_global_*.inp`): rails, crossbeams, drawbar and lap links together, under 3g deck load and diagonal racking — all members land at SF ≥ 4; details and per-member tables in [`fea/README.md`](fea/README.md).
+The fatigue-governing detail is not the beam but the bolt hole at the front crossbeam lap (`check_joint_hole` in `beam_check.py`). The fix is a clamp joint with **no holes in the beam flanges**: two L80×80×8 steel angles (`cad/drawbar_angle_joint.scad`, budget option), a CNC-milled cradle (`cad/drawbar_cradle.scad`), or square U-bolts — same concept, pick by budget/tooling. Per-member tables and model notes in [`fea/README.md`](fea/README.md).
 
 **PrintTrek** is an open-source, highly engineered, and modular offroad adventure trailer designed to be manufactured using a custom CNC router (like the PrintNC) and basic hand tools.
 

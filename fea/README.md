@@ -68,6 +68,10 @@ The entire load-bearing structure in one beam model (rails, three
 crossbeams, drawbar 85 mm below frame plane, lap joints as stiff links).
 Generated parametrically: `python3 scripts/gen_frame_fea.py`.
 
+The front lap is modeled as the **angle-bracket pair** (2× L80x80x8,
+`cad/drawbar_angle_joint.scad`, vertical legs lumped to a 120×16
+connector); the axle lap as the plain bolted spacer joint.
+
 **LC 3g vertical** (400 kg deck × 3g, supported at coupling + axle
 brackets) — max von Mises per member group:
 
@@ -76,7 +80,7 @@ brackets) — max von Mises per member group:
 | Side rails | 86 MPa | 4.1 |
 | Crossbeams | 87 MPa | 4.1 |
 | Drawbar | 36 MPa | 9.9* |
-| (lap links) | 191 MPa | idealized connector, not a real part — the real lap is plates + bolts, checked in `beam_check.py` |
+| Angle pair (front lap) | 25 MPa | 14 — their governing case is the *lateral* couple (~105 MPa, SF 3.4, `check_angle_joint`), not this vertical LC |
 
 \* the isolated 3g-tongue cantilever (89 MPa) remains the drawbar's
 governing envelope — dynamic pitching loads the tongue independently of
