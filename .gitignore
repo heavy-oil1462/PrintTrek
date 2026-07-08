@@ -4,3 +4,5 @@ fea/*.cvg
 fea/*.sta
 fea/*.12d
 fea/spooles.out
+__pycache__/
+*.pyc
