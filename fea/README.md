@@ -63,12 +63,44 @@ SF vs 6082-T6 yield (260 MPa): **~2.5** even in this bounding case.
 fiber / clamp line — reading a few % below the hand-calc envelope is
 expected; use the hand calc as the conservative number.
 
+### frame_global_3g.inp + frame_global_twist.inp — WHOLE CHASSIS
+The entire load-bearing structure in one beam model (rails, three
+crossbeams, drawbar 85 mm below frame plane, lap joints as stiff links).
+Generated parametrically: `python3 scripts/gen_frame_fea.py`.
+
+**LC 3g vertical** (400 kg deck × 3g, supported at coupling + axle
+brackets) — max von Mises per member group:
+
+| Member group | max vM | SF vs 355 |
+|---|---|---|
+| Side rails | 86 MPa | 4.1 |
+| Crossbeams | 87 MPa | 4.1 |
+| Drawbar | 36 MPa | 9.9* |
+| (lap links) | 191 MPa | idealized connector, not a real part — the real lap is plates + bolts, checked in `beam_check.py` |
+
+\* the isolated 3g-tongue cantilever (89 MPa) remains the drawbar's
+governing envelope — dynamic pitching loads the tongue independently of
+the deck.
+
+**LC diagonal racking** (three corners held, fourth lifted 30 mm): rails
+64 / crossbeams 60 MPa. The open ladder frame is torsionally soft —
+good off-road, and stresses stay low. (A "one wheel up" case with a ball
+coupling is a near-rigid roll of the whole trailer — verified zero
+stress — because the ball transmits no roll moment.)
+
+![Global 3g](frame_global_3g_stress.png)
+![Global racking](frame_global_twist_stress.png)
+
+**Joint modeling honesty:** member intersections are rigid shared nodes
+and the laps are stiff links. Bolt-level behavior (shear, bearing,
+net-section fatigue at the hole) is covered by `scripts/beam_check.py`;
+a true preload+contact model of one bolted joint is still open work.
+
 ## Next candidates for FEA (when the design firms up)
-- **Drawbar cradle joint** (`cad/drawbar_cradle.scad`): contact model of
-  cradle + beam + crossbeam confirming the no-hole-in-flange concept —
-  see `check_joint_hole` in `scripts/beam_check.py` for why the bolt hole
-  at the front crossbeam is the fatigue-governing detail.
+- **Drawbar cradle joint** (`cad/drawbar_cradle.scad`): preload+contact
+  model of cradle + beam + crossbeam confirming the no-hole-in-flange
+  concept — see `check_joint_hole` in `scripts/beam_check.py`.
 - Local wall bending of the 4 mm RHS around the crush sleeves under the
   lateral couple.
-- Frame torsion: one wheel on a 300 mm rock, diagonal twist of the bolted
-  (non-welded) frame — bolted joints are torsionally softer than welds.
+- Semi-rigid joint stiffness in the global model (springs calibrated from
+  a single-joint contact model) instead of rigid shared nodes.

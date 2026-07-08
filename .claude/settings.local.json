@@ -41,7 +41,11 @@
       "Bash(chmod +x scripts/run_fea.sh)",
       "Bash(./scripts/render_scad.sh cad/drawbar_cradle.scad drawbar_cradle.png)",
       "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 ./scripts/run_fea.sh)",
-      "Bash(git -c credential.helper='!gh auth git-credential' push origin main)"
+      "Bash(git -c credential.helper='!gh auth git-credential' push origin main)",
+      "Bash(python3 scripts/gen_frame_fea.py)",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad /dev/null)",
+      "Bash(sed -n '/ANGLE-BRACKET/,/interface/p')",
+      "Bash(./scripts/render_scad.sh cad/drawbar_angle_joint.scad drawbar_angle_joint.png)"
     ]
   }
 }

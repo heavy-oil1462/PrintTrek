@@ -15,6 +15,8 @@ Hand-calcs (`python3 scripts/beam_check.py`) + CalculiX FEA, both validated agai
 
 The fatigue-governing detail is not the beam but the bolt hole at the front crossbeam lap (`check_joint_hole` in `beam_check.py`) — `cad/drawbar_cradle.scad` is a milled clamp-cradle that eliminates that hole entirely.
 
+There is also a **whole-chassis model** (`scripts/gen_frame_fea.py` → `fea/frame_global_*.inp`): rails, crossbeams, drawbar and lap links together, under 3g deck load and diagonal racking — all members land at SF ≥ 4; details and per-member tables in [`fea/README.md`](fea/README.md).
+
 **PrintTrek** is an open-source, highly engineered, and modular offroad adventure trailer designed to be manufactured using a custom CNC router (like the PrintNC) and basic hand tools.
 
 Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek eliminates the need for complex and fatigue-prone welding by utilizing a structural, bolted-together chassis. It is specifically designed to be the perfect companion for a mid-size pickup (like the Ford Ranger), matching its track width, wheel specs, and offroad capabilities.

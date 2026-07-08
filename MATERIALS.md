@@ -9,6 +9,7 @@
 - **Wheels & Axle:** Braked torsion axle (overrun brakes, e.g., Knott/AL-KO) with 6x139.7 bolt pattern + shock absorber (damper) kit + matching overrun coupling with breakaway cable.
 - **Tires/Rims:** Falken Wildpeak A/T3W 265/60R18 on Ford Ranger original rims (x3 incl. spare).
 - **Drawbar & Protection:** Bent aluminum tread plate for stone protection, heavy-duty straps for propane.
+- **Drawbar Joint (front crossbeam):** 2x steel angle L80x80x8 (S355), 120 mm long, hot-dip galvanized — clamp joint, no holes in the beam flanges. (Alternatives: CNC-milled 6082-T6 cradle, or M12 square U-bolts + top plate.)
 
 ## Electrical System & Electronics (Left Side)
 - **Cable Protection:** Corrugated conduit (automotive grade).

@@ -195,6 +195,36 @@ def check_joint_hole(profile: RHS, d_hole=13.0):
     ])
 
 
+def check_angle_joint(leg=80.0, t=8.0, length=120.0):
+    """Budget alternative to the milled cradle: two hot-rolled steel angles
+    (e.g. L80x80x8, 120 mm long) flanking the beam at the front crossbeam.
+    Same concept: horizontal M12 through the beam WEBS at the neutral axis,
+    vertical M10 through the horizontal legs beside the beam. The angles'
+    weak spot is leg bending about the corner ("prying") under the lateral
+    couple — that is what this check sizes."""
+    F_lat = DYN_LAT * TOTAL_MASS * G
+    F_joint = F_lat * LEVER_VERT / LAP_BASE + F_lat   # worst crossbeam, N
+
+    lever = 60.0        # mm, corner (at crossbeam face) -> web bolt line (NA)
+    m = F_joint * lever / length                      # Nmm per mm of angle
+    W_mm = t**2 / 6.0
+    s_one = m / W_mm                                  # one angle alone
+    s_pair = s_one / 2.0                              # through-bolts couple both
+
+    report(f"ANGLE-BRACKET JOINT — 2x L{leg:.0f}x{leg:.0f}x{t:.0f} "
+           f"x {length:.0f} mm (cradle alternative)", [
+        f"Lateral force at worst joint: {F_joint/1e3:.1f} kN, "
+        f"lever corner->NA bolt = {lever:.0f} mm",
+        f"Leg bending: one angle {s_one:.0f} MPa / pair sharing "
+        f"{s_pair:.0f} MPa   SF = {sf(s_pair):.1f}",
+        f"(t=6 mm would give {s_pair*(t/6.0)**2:.0f} MPa -> "
+        f"SF {sf(s_pair*(t/6.0)**2):.1f} — use 8 mm legs)",
+        "Same fatigue advantage as the cradle: NO holes in the beam",
+        "flanges; web holes at the neutral axis. Angles are hot-rolled",
+        "S355, galvanized with the frame — no galvanic interface at all.",
+    ])
+
+
 def check_bolts():
     # Drawbar-to-crossbeam M12 8.8 through-bolts with crush sleeves.
     # Governing action: lap couple from LC2 + direct shear, single shear plane
@@ -243,6 +273,7 @@ def main():
     check_drawbar(PROFILES["VKR 50x50x3"])
     check_side_rail(PROFILES["VKR 50x50x3"])
     check_joint_hole(PROFILES["VKR 100x50x4"])
+    check_angle_joint()
     check_bolts()
 
     print("\nRule of thumb: SF >= 2.0 on yield for dynamic off-road cases.")
