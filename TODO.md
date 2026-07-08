@@ -5,7 +5,7 @@
 - [ ] Maintain the weight & tongue-load budget (`scripts/calculate_mass.py`) — decides braked vs. unbraked axle and axle position.
 - [ ] Research registration requirements (registreringsbesiktning): lighting, reflectors, fenders, coupling approval. Contact inspection body early.
 - [x] CAD model the base frame (VKR profiles) and define bolt patterns for the corners.
-- [x] Design the drawbar attachment plates. (Current design: single central VKR 100x50x4 beam with flat 10 mm spacer plates at both crossbeam laps; `cad/drawbar_wedge_plate.scad` kept for the V-drawbar alternative.)
+- [x] Design the drawbar attachment. (DECIDED: single central VKR 100x50x4 beam; front crossbeam = angle-bracket clamp 2x L80x80x8 with no holes in the beam flanges (`cad/drawbar_angle_joint.scad`), axle crossbeam = M12 through-bolt + 10 mm spacer. `cad/drawbar_wedge_plate.scad`/`drawbar_cradle.scad` kept as alternatives.)
 - [x] Add fenders, lighting positions, and jockey wheel to the CAD model (`cad/fender.scad`, `cad/road_equipment.scad`, `cad/wheel_axle.scad`).
 - [x] **Resolve the track width conflict:** RESOLVED by narrowing the frame to 1200 mm — the 1560 mm Ranger track now fits with 47.5 mm tire-to-body clearance (see `cad/wheel_axle.scad`). Verify against the real car in the "Measure the Ford Ranger" task above.
 - [ ] Prototype and physically test ONE bolted corner joint (crush sleeves, torque retention after vibration, Duralac interface) before committing to the full frame.

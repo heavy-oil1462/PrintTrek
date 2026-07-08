@@ -19,6 +19,7 @@ use <kitchen_drawer.scad>
 use <road_equipment.scad>
 use <gas_bottle_mount.scad>
 use <battery_box.scad>
+use <drawbar_angle_joint.scad>
 
 // --- System Parameters ---
 $fn = 60;
@@ -43,8 +44,12 @@ bar_w = 50;
 bar_h = 100;
 
 // --- Axle/wheel geometry (must match wheel_axle.scad) ---
+// axle_x = the axle crossbeam AND the wheel-center line (AXLE_X in the
+// mass budget). The torsion-axle TUBE sits trail=90 mm ahead of it so
+// the trailing-arm hubs land exactly here.
 axle_x = frame_length * 0.6;
-hub_x = axle_x + 90;
+trail = 90;
+hub_x = axle_x;
 hub_z = -190;
 track = 1560;   // Ford Ranger track — matched (see wheel_axle.scad)
 
@@ -111,17 +116,20 @@ translate([frame_length, 0, -plate_thickness]) rotate([0, 0, 90]) place_corner()
 translate([frame_length, frame_width, tube_w]) rotate([0, 0, 180]) place_corner();
 translate([frame_length, frame_width, -plate_thickness]) rotate([0, 0, 180]) place_corner();
 
-// 3.5 Drawbar spacer plates
-// The central drawbar bolts UNDER the front crossbeam and the axle
-// crossbeam (see frame.scad); 10 mm milled plates fill the gap at both
-// lap joints. (drawbar_wedge_plate.scad remains in the repo for the
-// V-drawbar alternative.)
-color("gold") {
-    translate([0, frame_width/2 - bar_w/2, -plate_thickness])
-        cube([tube_w, bar_w, plate_thickness]);
+// 3.5 Drawbar lap joints (structural — part of the chassis view)
+// FRONT crossbeam: angle-bracket clamp (2x L80x80x8 + spacer plate,
+// see drawbar_angle_joint.scad) — NO holes in the beam flanges at the
+// peak-moment point; web bolts at the neutral axis. Fatigue rationale
+// in scripts/beam_check.py (check_joint_hole / check_angle_joint).
+translate([tube_w/2, frame_width/2, 0]) drawbar_angle_joint();
+
+// AXLE crossbeam: plain through-bolted lap + 10 mm spacer (bending
+// moment ~zero here; the through-bolt gives positive longitudinal
+// location). drawbar_wedge_plate.scad remains for the V-drawbar
+// alternative.
+color("gold")
     translate([frame_length*0.6, frame_width/2 - bar_w/2, -plate_thickness])
         cube([tube_w, bar_w, plate_thickness]);
-}
 
 // 3.6 T-plates for Center Beam (Torsion Axle)
 // Left side
@@ -150,8 +158,8 @@ if (show_cabin) {
 // 5. Running Gear (load-bearing)
 // ==========================================
 if (show_running_gear) {
-    // Braked torsion axle + 265/60R18 wheels
-    torsion_axle(axle_x);
+    // Braked torsion axle + 265/60R18 wheels (tube ahead, hubs on axle_x)
+    torsion_axle(axle_x - trail);
 
     // Fenders (registration requirement)
     translate([hub_x, frame_width/2 - track/2, hub_z]) fender();
@@ -162,8 +170,11 @@ if (show_running_gear) {
 // 6. Systems & Payload
 // ==========================================
 if (show_equipment) {
-    // Water tank + skid plate, centered just ahead of the axle
-    translate([950, frame_width/2, 0]) water_tank_assembly();
+    // Water tank + skid plate, just ahead of the axle TUBE and offset
+    // LEFT of the central drawbar (the beam occupies y 575-625 under the
+    // frame — a centered tank would be impaled by it). The left offset
+    // also counterbalances the right-side galley mass (battery + fridge).
+    translate([780, 330, 0]) water_tank_assembly();   // 20 mm gap to the drawbar
 
     // Gas bottle cradle on the drawbar, FLUSH against the front wall
     // (bottle edge ~45 mm from the wall; the stone guard wraps the front)
@@ -225,4 +236,10 @@ if (show_equipment) {
     // Jockey wheel clamped to the drawbar
     translate([-800, frame_width/2, -plate_thickness])
         jockey_wheel();
+
+    // Spare wheel on the LEFT half of the tailgate (swings with the
+    // hatch). It cannot sit centered — the fridge drawer exits through
+    // the rear right. Alternative if hatch hinges can't take 32 kg:
+    // roof rack, forward of the tent.
+    translate([2003 + 265/2, 390, 420]) rotate([0, 0, 90]) wheel();
 }

@@ -43,7 +43,12 @@ module wheel() {
     }
 }
 
-module torsion_axle(axle_x = frame_length * 0.6) {
+// NOTE: axle_x is the position of the axle TUBE. The trailing arms put
+// the hubs (= wheel centers = ground contact) `trail` = 90 mm further
+// back. To land the WHEELS on the axle crossbeam (and on AXLE_X in
+// scripts/calculate_mass.py), pass crossbeam_x - trail — the assembly
+// does. When ordering the real axle, specify the HUB line, not the tube.
+module torsion_axle(axle_x = frame_length * 0.6 - trail) {
     y_hub_l = frame_width/2 - track/2;
     y_hub_r = frame_width/2 + track/2;
 

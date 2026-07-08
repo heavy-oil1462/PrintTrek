@@ -53,17 +53,22 @@ module angle_bracket() {
     }
 }
 
-// --- assembled joint --------------------------------------------------
-color("SteelBlue") {
-    translate([-ang_len/2, bar_w/2, 0]) angle_bracket();               // right
-    mirror([0, 1, 0]) translate([-ang_len/2, bar_w/2, 0]) angle_bracket(); // left
+// --- assembled joint (module so main_assembly.scad can place it) ------
+// Origin: center of the crossbeam contact face, z=0 at crossbeam
+// underside, drawbar hanging below in -Z, beam axis along X.
+module drawbar_angle_joint() {
+    color("SteelBlue") {
+        translate([-ang_len/2, bar_w/2, 0]) angle_bracket();               // right
+        mirror([0, 1, 0]) translate([-ang_len/2, bar_w/2, 0]) angle_bracket(); // left
+    }
+    // Spacer plate (still needed: carries vertical compression)
+    color("gold") translate([-tube_w/2, -bar_w/2, -spacer_t])
+        cube([tube_w, bar_w, spacer_t]);
 }
 
-// Spacer plate (still needed: carries vertical compression)
-color("gold") translate([-tube_w/2, -bar_w/2, -spacer_t])
-    cube([tube_w, bar_w, spacer_t]);
+drawbar_angle_joint();
 
-// Ghost context: drawbar below, crossbeam above
+// Ghost context when opened standalone: drawbar below, crossbeam above
 %color("gray", 0.4) translate([-200, -bar_w/2, -spacer_t - bar_h])
     cube([400, bar_w, bar_h]);
 %color("gray", 0.4) translate([-tube_w/2, -160, 0])

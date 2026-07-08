@@ -37,6 +37,7 @@ COMPONENTS = [
     ("Corner plates 8x 200x200x10 (1.08 kg ea)",        8.6, 1000),
     ("T-plates axle beam 4x (~1.5 kg ea)",              6.0, AXLE_X),
     ("Drawbar wedge/spacer plates",                     3.0,  100),
+    ("Drawbar angle brackets 2x L80x80x8 x 120 mm",     2.3,   25),
 
     # --- Running gear ---
     ("Torsion axle, braked, 6x139.7 + dampers",        75.0, AXLE_X),
@@ -52,9 +53,10 @@ COMPONENTS = [
     ("Rear door, hinges, locks, seals",                 8.0, 1950),
     ("Roof racks + roof tent",                         70.0, 1000),
 
-    # --- Water (tank full) ---
-    ("Water tank 40 L FULL + tank",                    45.0, 1100),
-    ("Skid plate 3 mm alu tread (~0.8 m2)",             6.5, 1100),
+    # --- Water (tank full; offset left of the drawbar, ahead of the
+    #     axle tube — see main_assembly.scad) ---
+    ("Water tank 40 L FULL + tank",                    45.0,  780),
+    ("Skid plate 3 mm alu tread (~0.8 m2)",             6.5,  780),
     ("Pump, hoses, filler, drain valve",                4.0, 1200),
 
     # --- Electrical (right side, bay ahead of the fridge drawer) ---

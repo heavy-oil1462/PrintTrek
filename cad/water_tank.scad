@@ -2,9 +2,10 @@
  * Offroad Adventure Trailer - Water Tank + Skid Plate
  *
  * 40 L food-grade tank (550x450x160 = 39.6 L gross, baffled), slung under
- * the frame just ahead of the axle. Two steel straps carry the tank;
- * a 3 mm aluminum tread skid plate with a beveled leading edge protects
- * it from rocks and stumps.
+ * the frame just ahead of the axle TUBE and offset LEFT of the central
+ * drawbar (which owns y 575-625 under the frame). Two steel straps carry
+ * the tank; a 3 mm aluminum tread skid plate with a beveled leading edge
+ * protects it from rocks and stumps.
  *
  * LOW-PROFILE ON PURPOSE: with the frame underside ~577 mm above ground,
  * a 220 mm-deep tank hung down to ~336 mm clearance and was the lowest
