@@ -46,7 +46,7 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
 | | |
 |---|---|
 | ![Main assembly](main_assembly.png) | ![Water tank + skid plate](water_tank.png) |
-| **Full assembly concept** — kitchen side-drawer front left, storage cabinet mid left, electrical bay mid right, fridge drawer out the rear right | **Low-profile 40 L water tank** — 160 mm deep so the 3 mm skid plate sits level with the axle tube (~405 mm clearance) |
+| **Full assembly concept** — kitchen side-drawer front left, storage cabinet mid left, electrical bay mid right, fridge drawer out the rear right | **Low-profile 40 L water tank** — 160 mm deep so the 3 mm skid plate sits level with the axle tube (~405 mm clearance); mounting under review, currently not in the assembly |
 
 The body/galley layout is still being iterated and does not drive the structure. Renders are generated headlessly with `scripts/render_scad.sh cad/<model>.scad <output>.png` (chassis-only: add `-D show_cabin=false -D show_equipment=false`).
 

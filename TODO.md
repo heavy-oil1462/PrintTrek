@@ -16,7 +16,7 @@
 - [ ] Design CNC-milled niches for external electrical and gas outlets. (Electrical niche done — gas-side niches remain.)
 - [ ] Design mount/cradle for propane tank on the drawbar (including stone protection). (Cradle done — stone-guard tread plate remains.)
 - [ ] Develop layouts for the electrical cabinet and network components (star ground, IP65 box).
-- [x] Design the water tank placement and aluminum tread skid plate (`cad/water_tank.scad`).
+- [ ] Design the water tank placement and mounting (tank + skid modeled in `cad/water_tank.scad`, but REMOVED from the assembly for now — the underslung mount must clear the central drawbar and axle tube; placeholder mass at x=780 in the tongue budget).
 - [x] CAD model the kitchen drawer with space for the 12V compressor fridge and an electrical-only cable chain (`cad/kitchen_drawer.scad`).
 
 ## Phase 2: Material Sourcing & Purchasing

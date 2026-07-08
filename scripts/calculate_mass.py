@@ -53,10 +53,11 @@ COMPONENTS = [
     ("Rear door, hinges, locks, seals",                 8.0, 1950),
     ("Roof racks + roof tent",                         70.0, 1000),
 
-    # --- Water (tank full; offset left of the drawbar, ahead of the
-    #     axle tube — see main_assembly.scad) ---
-    ("Water tank 40 L FULL + tank",                    45.0,  780),
-    ("Skid plate 3 mm alu tread (~0.8 m2)",             6.5,  780),
+    # --- Water (PLACEHOLDER: tank removed from the CAD assembly while
+    #     the mounting is reworked; keep the mass here at the candidate
+    #     position so the tongue budget stays honest) ---
+    ("Water tank 40 L FULL + tank (mounting TBD)",     45.0,  780),
+    ("Skid plate 3 mm alu tread (mounting TBD)",        6.5,  780),
     ("Pump, hoses, filler, drain valve",                4.0, 1200),
 
     # --- Electrical (right side, bay ahead of the fridge drawer) ---

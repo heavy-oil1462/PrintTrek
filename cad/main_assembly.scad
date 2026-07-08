@@ -174,11 +174,11 @@ if (show_running_gear) {
 // 6. Systems & Payload
 // ==========================================
 if (show_equipment) {
-    // Water tank + skid plate, just ahead of the axle TUBE and offset
-    // LEFT of the central drawbar (the beam occupies y 575-625 under the
-    // frame — a centered tank would be impaled by it). The left offset
-    // also counterbalances the right-side galley mass (battery + fridge).
-    translate([780, 330, 0]) water_tank_assembly();   // 20 mm gap to the drawbar
+    // Water tank: REMOVED from the assembly for now — mounting/placement
+    // is being reworked (the underslung spot must dodge the central
+    // drawbar at y 575-625 and the axle tube at x 1070-1150; candidate
+    // was [780, 330] offset left). Model kept in cad/water_tank.scad;
+    // mass stays as a placeholder in scripts/calculate_mass.py.
 
     // Gas bottle cradle on the drawbar, FLUSH against the front wall
     // (bottle edge ~45 mm from the wall; the stone guard wraps the front)
