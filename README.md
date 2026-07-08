@@ -26,6 +26,15 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
 - **Slide-Out Kitchen:** Accommodates a heavy-duty drawer (100-150kg slides) for a 12V compressor fridge (e.g., Dometic CFX), fed via an electrical-only energy chain. Propane stays on fixed pipes to external quick-connects for outdoor cooking.
 - **CAN-Bus Control System:** Arduino-based CAN nodes (relays + sensors), a Go backend on a Raspberry Pi, and a web dashboard for monitoring water level, battery voltage, and temperature, and for switching the pump, lights, and fridge remotely.
 
+## Design Snapshots
+
+| | |
+|---|---|
+| ![Main assembly](main_assembly.png) | ![Water tank + skid plate](water_tank.png) |
+| **Main assembly** — 2000×1200 mm bolted frame, single VKR 100x50x4 drawbar, slide-out kitchen | **Low-profile 40 L water tank** — 160 mm deep so the 3 mm skid plate sits level with the axle tube (~405 mm clearance) |
+
+Renders are generated headlessly from the OpenSCAD sources with `scripts/render_scad.sh cad/<model>.scad <output>.png`.
+
 ## Repository Structure
 
 - `/cad`: Contains all the 3D models and manufacturing files (e.g., OpenSCAD, STEP, or STL files) for the corner plates, niches, and chassis geometry.

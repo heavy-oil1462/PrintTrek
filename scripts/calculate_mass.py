@@ -29,7 +29,7 @@ COMPONENTS = [
     ("Front crossbeam 1.1 m VKR 50x50x3",              5.0,   25),
     ("Axle crossbeam 1.1 m VKR 50x50x3",               5.0, AXLE_X),
     ("Rear crossbeam 1.1 m VKR 50x50x3",               5.0, 1975),
-    ("Drawbar arms 2x 1.70 m VKR 50x50x3",            15.5, -200),
+    ("Central drawbar 2.25 m VKR 100x50x4 (8.6 kg/m)", 20.5,  125),
     ("Coupling head (type-approved) + bolts",           4.0, COUPLING_X),
     ("Crush sleeves, bolts, nuts, washers",             6.0,  900),
 

@@ -12,7 +12,15 @@
       "Bash(nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A openscad --no-out-link)",
       "Bash(nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A openscad-unstable --no-out-link)",
       "Bash(LD_DEBUG=libs /nix/store/p257r2y0182281r3ybj3wxciwx3vw4w6-openscad-unstable-2025-06-04/bin/openscad --version)",
-      "Bash(git -C /workspace status --short)"
+      "Bash(git -C /workspace status --short)",
+      "Bash(mkdir -p /workspace/fea)",
+      "Bash(python3 -)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/6s7v4njrfr0jv79f5mxjggb58a7kjgxv-calculix-ccx-2.22/bin/ccx drawbar_cantilever)",
+      "Bash(chmod +x /workspace/scripts/run_ccx.sh)",
+      "Bash(rm -f *.cvg *.sta *.12d spooles.out)",
+      "Bash(./scripts/render_scad.sh cad/water_tank.scad water_tank.png)",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad main_assembly.png)",
+      "Bash(git add *)"
     ]
   }
 }

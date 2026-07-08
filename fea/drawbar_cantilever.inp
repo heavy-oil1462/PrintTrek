@@ -1,0 +1,57 @@
+** PrintTrek drawbar - vertical load case LC1 (see scripts/beam_check.py)
+** Cantilever VKR 100x50x4 standing, length 1090 mm, tip load 3g x 80 kg = 2354 N
+** Units: mm, N, MPa. Expected root bending stress ~89 MPa (hand calc, W=28.8 cm3)
+*NODE, NSET=NALL
+1, 0.00, 0., 0.
+2, 54.50, 0., 0.
+3, 109.00, 0., 0.
+4, 163.50, 0., 0.
+5, 218.00, 0., 0.
+6, 272.50, 0., 0.
+7, 327.00, 0., 0.
+8, 381.50, 0., 0.
+9, 436.00, 0., 0.
+10, 490.50, 0., 0.
+11, 545.00, 0., 0.
+12, 599.50, 0., 0.
+13, 654.00, 0., 0.
+14, 708.50, 0., 0.
+15, 763.00, 0., 0.
+16, 817.50, 0., 0.
+17, 872.00, 0., 0.
+18, 926.50, 0., 0.
+19, 981.00, 0., 0.
+20, 1035.50, 0., 0.
+21, 1090.00, 0., 0.
+*ELEMENT, TYPE=B32R, ELSET=EALL
+1, 1, 2, 3
+2, 3, 4, 5
+3, 5, 6, 7
+4, 7, 8, 9
+5, 9, 10, 11
+6, 11, 12, 13
+7, 13, 14, 15
+8, 15, 16, 17
+9, 17, 18, 19
+10, 19, 20, 21
+*MATERIAL, NAME=S355
+*ELASTIC
+210000., 0.3
+*BEAM SECTION, ELSET=EALL, MATERIAL=S355, SECTION=BOX
+50., 100., 4., 4., 4., 4.
+0., 1., 0.
+*BOUNDARY
+21, 1, 6
+*STEP
+*STATIC
+*CLOAD
+1, 3, -2354.
+*NODE PRINT, NSET=NALL
+U
+*EL PRINT, ELSET=EALL
+S
+*NODE FILE
+U
+*EL FILE
+S
+*END STEP

@@ -1,7 +1,7 @@
 # Material & Component List (BOM)
 
 ## Chassis & Mechanics
-- **Steel Profiles:** Square steel tubes VKR 50x50x3 mm (or 60x40x3 mm).
+- **Steel Profiles:** Square steel tubes VKR 50x50x3 mm (or 60x40x3 mm); drawbar in VKR 100x50x4 mm (~2.3 m, standing on edge).
 - **Corner Plates:** Aluminum 6082-T6, 8-10 mm (for CNC milling).
 - **Fasteners:** Through-bolts M10/M12 in grade 8.8 or 10.9, lock nuts, hardened washers.
 - **Crush Sleeves:** Internal steel sleeves for every through-bolt (precision tube, e.g., 16x2.5 mm ID 11 for M10; 20x3 mm for M12), cut to the inner width of the VKR profile — required to reach full bolt preload without collapsing the 3 mm tube walls.

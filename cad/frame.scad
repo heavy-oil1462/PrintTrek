@@ -2,18 +2,23 @@
 /*
  * Offroad Adventure Trailer - Chassi / Stålram
  *
- * Parametrisk modell för grundramen i 50x50 mm fyrkantsstål (VKR).
- * V-formad dragstång (A-ram) i samma profil: två raka armar från kopplingen,
- * genombultade under främre tvärbalken och långbalkarna.
+ * Parametrisk modell för grundramen i 50x50 mm fyrkantsstål (VKR)
+ * med central dragbalk i VKR 100x50x4 (stående).
  *
- * OBS: En tidigare version använde en enkel central dragbalk. Den är
- * borttagen — en ensam 50x50x3-balk klarar inte dynamiska offroadlaster
- * (~3g på kultrycket ger böjspänning över sträckgränsen). V-formen
- * triangulerar dessutom mot sidokrafter.
+ * DIMENSIONERING AV DRAGBALKEN:
+ *   100 kg kultryck x 3g dynamiskt offroadtillägg x 1,09 m hävarm
+ *   = 3,2 kNm böjmoment vid främre tvärbalken.
+ *   VKR 100x50x4 stående: W = 28,8 cm3 -> ~111 MPa mot S355 sträckgräns
+ *   = säkerhetsfaktor ~3,2 (bra fatigue-marginal).
+ *   (En 50x50x3 gav ~390 MPa - över sträckgränsen - därav den grövre balken.
+ *    Ett V-drag är alternativet; se drawbar_wedge_plate.scad + git-historik.)
+ *   Sidokrafter: balken lappar under ramen ända bak till axeltvärbalken,
+ *   så sidomomentet tas som ett kraftpar över 1,2 m i stället för i en
+ *   enda knutpunkt. Bultning vid båda tvärbalkarna (M12 + krosshylsor).
  *
  * Alla genomgående bultar i ramen kräver invändiga krosshylsor
- * (precisionsrör, t.ex. 16x2,5 mm för M10) så att fullt förspänningsmoment
- * kan användas utan att RHS-väggarna deformeras.
+ * (precisionsrör, t.ex. 16x2,5 mm för M10, 20x3 för M12) så att fullt
+ * förspänningsmoment kan användas utan att RHS-väggarna deformeras.
  */
 
 tube_w = 50;
@@ -24,21 +29,13 @@ frame_width = 1200;      // Smalnad från 1400: med 265/60R18 på Rangerns
                          // geometriskt omöjlig med matchad spårvidd.
 plate_t = 10;            // Tjocklek på aluminiumplattorna (hörn/kil/distans)
 
-// --- Dragstång (V-form / A-ram) ---
+// --- Central dragbalk (VKR 100x50x4, stående) ---
 drawbar_reach = 1000;    // Kopplingspunktens avstånd framför ramen
-drawbar_attach_x = 600;  // Där armarnas bakre ände fäster under långbalkarna
-
-// Armgeometri (toppnivå så att scripts/calculate_tubes.py hittar kaplängden)
-arm_dx = drawbar_attach_x + drawbar_reach;
-arm_dy = frame_width/2 - tube_w/2;
-arm_len = sqrt(arm_dx*arm_dx + arm_dy*arm_dy);
-
-// Raka armar från infästningen under långbalkarna (drawbar_attach_x)
-// till kopplingspunkten (-drawbar_reach, frame_width/2).
-// Ligger plate_t under ramplanet: 10 mm CNC-frästa kil-/distansplattor
-// (samma aluplåt som hörnplattorna) fyller spalten vid varje infästning,
-// och bultarna delas med hörnens "double sandwich" där de sammanfaller.
-// (Medvetet två explicita cube-anrop så att kaplistan räknar 2 st.)
+bar_w = 50;              // Balkbredd (Y)
+bar_h = 100;             // Balkhöjd (Z) - stående orientering för max W
+// Balken lappar under ramen till och med axeltvärbalken:
+drawbar_end_x = frame_length*0.6 + tube_w;
+drawbar_len = drawbar_reach + drawbar_end_x;
 
 module trailer_frame() {
     color("silver") {
@@ -57,20 +54,15 @@ module trailer_frame() {
         translate([frame_length*0.6, tube_w, 0])
             rotate([0, 0, 90]) cube([frame_width - 2*tube_w, tube_w, tube_w]);
 
-        // V-dragstång (A-ram): vänster arm
-        translate([drawbar_attach_x, tube_w/2, -(tube_w + plate_t)])
-            rotate([0, 0, atan2(arm_dy, -arm_dx)])
-                translate([0, -tube_w/2, 0])
-                    cube([arm_len, tube_w, tube_w]);
+        // Central dragbalk (VKR 100x50x4, stående): ligger plate_t under
+        // ramplanet. 10 mm frästa distansplattor fyller spalten vid främre
+        // tvärbalken och axeltvärbalken, där balken genombultas
+        // (M12 + krosshylsor genom båda profilerna).
+        translate([-drawbar_reach, frame_width/2 - bar_w/2, -(bar_h + plate_t)])
+            cube([drawbar_len, bar_w, bar_h]);
 
-        // V-dragstång (A-ram): höger arm
-        translate([drawbar_attach_x, frame_width - tube_w/2, -(tube_w + plate_t)])
-            rotate([0, 0, atan2(-arm_dy, -arm_dx)])
-                translate([0, -tube_w/2, 0])
-                    cube([arm_len, tube_w, tube_w]);
-
-        // Draghandske (fiktiv för visuellt stöd, vid kopplingspunkten)
-        translate([-drawbar_reach - 120, frame_width/2 - tube_w/2, -(tube_w + plate_t)])
+        // Draghandske (fiktiv för visuellt stöd, i nivå med balkens överkant)
+        translate([-drawbar_reach - 120, frame_width/2 - tube_w/2, -(plate_t + tube_w)])
             cube([120, tube_w, tube_w]);
     }
 }

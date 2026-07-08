@@ -8,6 +8,6 @@
 
 ## Water System (Centered)
 - **Center of Gravity:** The 40L tank weighs nearly 45 kg full. Placed exactly between the wheels (in front of/over the torsion axle) so as not to drastically affect the tongue weight during consumption.
-- **Protection:** Suspended in a steel frame/straps under the trailer. Protected from below with a heavy-duty 3 mm aluminum tread plate (skid plate) to withstand rock strikes and stumps.
+- **Protection:** Suspended in a steel frame/straps under the trailer. Protected from below with a heavy-duty 3 mm aluminum tread plate (skid plate) with a 45-degree beveled leading edge. **Low-profile tank (160 mm deep) on purpose:** a 220 mm tank hung to ~336 mm ground clearance and was the trailer's lowest point; at 160 mm the skid sits at ~405 mm, roughly level with the axle tube, so wheels/axle meet obstacles first and the skid only takes glancing hits. (Alternative if this still feels exposed: move the tank inside the cabin above the floor — full protection and frost-friendlier, at the cost of cargo space and higher CG.)
 - **Pipe Routing:** A 12V galley pump is mounted indoors (frost-free/protected) on rubber mounts to absorb pump noise. Externally lockable filler cap in the Dibond wall.
 - **Drainage:** An absolute requirement is a low point with a drain valve that can be opened from the side of the trailer before freezing temperatures.

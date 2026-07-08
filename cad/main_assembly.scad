@@ -12,7 +12,6 @@ use <cabin.scad>
 use <corner_plate.scad>
 use <t_plate.scad>
 use <electrical_niche.scad>
-use <drawbar_wedge_plate.scad>
 use <wheel_axle.scad>
 use <fender.scad>
 use <water_tank.scad>
@@ -33,13 +32,11 @@ show_equipment = true;    // Wheels, tank, kitchen, gas, electrics, lights
 drawer_pullout = 300;     // Kitchen drawer extension for visualization (mm)
 
 // --- Drawbar geometry (must match frame.scad) ---
+// Single central beam, VKR 100x50x4 standing on edge, lapped under the
+// frame back to the axle crossbeam. Sizing math in frame.scad.
 drawbar_reach = 1000;
-drawbar_attach_x = 600;
-arm_dx = drawbar_attach_x + drawbar_reach;
-arm_dy = frame_width/2 - tube_w/2;
-arm_angle = atan2(arm_dy, -arm_dx);   // left arm; right arm mirrors
-// Where the arm centerline crosses the front crossbeam centerline
-cross_y = tube_w/2 + arm_dy * (drawbar_attach_x - tube_w/2) / arm_dx;
+bar_w = 50;
+bar_h = 100;
 
 // --- Axle/wheel geometry (must match wheel_axle.scad) ---
 axle_x = frame_length * 0.6;
@@ -110,20 +107,17 @@ translate([frame_length, 0, -plate_thickness]) rotate([0, 0, 90]) place_corner()
 translate([frame_length, frame_width, tube_w]) rotate([0, 0, 180]) place_corner();
 translate([frame_length, frame_width, -plate_thickness]) rotate([0, 0, 180]) place_corner();
 
-// 3.5 Drawbar wedge/spacer plates
-// The V-drawbar (A-frame) arms bolt UNDER the side rails and front
-// crossbeam (see frame.scad). 10 mm CNC-milled parallelogram plates fill
-// the gap at each angled lap joint.
-// At the side-rail attachments (arm end):
-translate([drawbar_attach_x, tube_w/2, -plate_thickness])
-    drawbar_wedge_plate(angle = arm_angle);
-translate([drawbar_attach_x, frame_width - tube_w/2, -plate_thickness])
-    drawbar_wedge_plate(angle = -arm_angle);
-// Where the arms cross under the front crossbeam:
-translate([tube_w/2, cross_y, -plate_thickness])
-    rotate([0, 0, 90]) drawbar_wedge_plate(angle = arm_angle - 90);
-translate([tube_w/2, frame_width - cross_y, -plate_thickness])
-    rotate([0, 0, 90]) drawbar_wedge_plate(angle = -(arm_angle - 90));
+// 3.5 Drawbar spacer plates
+// The central drawbar bolts UNDER the front crossbeam and the axle
+// crossbeam (see frame.scad); 10 mm milled plates fill the gap at both
+// lap joints. (drawbar_wedge_plate.scad remains in the repo for the
+// V-drawbar alternative.)
+color("gold") {
+    translate([0, frame_width/2 - bar_w/2, -plate_thickness])
+        cube([tube_w, bar_w, plate_thickness]);
+    translate([frame_length*0.6, frame_width/2 - bar_w/2, -plate_thickness])
+        cube([tube_w, bar_w, plate_thickness]);
+}
 
 // 3.6 T-plates for Center Beam (Torsion Axle)
 // Left side
@@ -186,7 +180,7 @@ if (show_equipment) {
     translate([2003, 220, -20]) triangle_reflector();
     translate([2003, 850, -20]) triangle_reflector();
     translate([2003, 360, -25]) number_plate();
-    // Jockey wheel clamped to the left drawbar arm
-    translate([-800, tube_w/2 + arm_dy * (drawbar_attach_x + 800) / arm_dx, -plate_thickness])
+    // Jockey wheel clamped to the drawbar
+    translate([-800, frame_width/2, -plate_thickness])
         jockey_wheel();
 }

@@ -5,13 +5,14 @@
 - [ ] Maintain the weight & tongue-load budget (`scripts/calculate_mass.py`) — decides braked vs. unbraked axle and axle position.
 - [ ] Research registration requirements (registreringsbesiktning): lighting, reflectors, fenders, coupling approval. Contact inspection body early.
 - [x] CAD model the base frame (VKR profiles) and define bolt patterns for the corners.
-- [x] Design the CNC-milled wedge/spacer plates for the V-drawbar arm attachments (`cad/drawbar_wedge_plate.scad`).
+- [x] Design the drawbar attachment plates. (Current design: single central VKR 100x50x4 beam with flat 10 mm spacer plates at both crossbeam laps; `cad/drawbar_wedge_plate.scad` kept for the V-drawbar alternative.)
 - [x] Add fenders, lighting positions, and jockey wheel to the CAD model (`cad/fender.scad`, `cad/road_equipment.scad`, `cad/wheel_axle.scad`).
 - [x] **Resolve the track width conflict:** RESOLVED by narrowing the frame to 1200 mm — the 1560 mm Ranger track now fits with 47.5 mm tire-to-body clearance (see `cad/wheel_axle.scad`). Verify against the real car in the "Measure the Ford Ranger" task above.
 - [ ] Prototype and physically test ONE bolted corner joint (crush sleeves, torque retention after vibration, Duralac interface) before committing to the full frame.
 - [x] Design 3D printed drill guides to ensure accurate hole placement on the steel beams (`cad/drill_guide.scad`).
 - [ ] Create a simplified geometry version (non-CNC) for builders without access to a CNC router.
-- [ ] CAD design and simulate the corner reinforcements ("double sandwich") in 8-10 mm aluminum. (Modeled — FEA/simulation remains.)
+- [x] Set up structural-calculation tooling: `scripts/beam_check.py` (RHS bending, bolt groups, safety factors) + CalculiX FEA in `fea/` (validated drawbar model). See `.claude/skills/structural-calc/`.
+- [ ] CAD design and simulate the corner reinforcements ("double sandwich") in 8-10 mm aluminum. (Modeled — corner-plate FEA remains; candidate list in `fea/README.md`.)
 - [ ] Design CNC-milled niches for external electrical and gas outlets. (Electrical niche done — gas-side niches remain.)
 - [ ] Design mount/cradle for propane tank on the drawbar (including stone protection). (Cradle done — stone-guard tread plate remains.)
 - [ ] Develop layouts for the electrical cabinet and network components (star ground, IP65 box).
