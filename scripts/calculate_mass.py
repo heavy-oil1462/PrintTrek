@@ -57,21 +57,24 @@ COMPONENTS = [
     ("Skid plate 3 mm alu tread (~0.8 m2)",             6.5, 1100),
     ("Pump, hoses, filler, drain valve",                4.0, 1200),
 
-    # --- Electrical (left side) ---
-    ("Power station box (200Ah LiFePO4, inverter, chargers)", 40.0, 400),
+    # --- Electrical (right side, bay ahead of the fridge drawer) ---
+    ("Power station box (200Ah LiFePO4, inverter, chargers)", 40.0, 920),
     ("Solar panel 200 W rigid + roof brackets",        14.0, 1000),
     ("IP65 cabinet, wiring, conduits, lighting",       12.0,  800),
     ("Teltonika router, antenna, coax",                 3.0,  600),
 
     # --- Gas (right side / drawbar) ---
-    ("Propane P6 bottle FULL (6 kg gas + steel)",      14.0, -600),
-    ("Cradle, stone guard, straps",                     7.0, -600),
+    ("Propane P6 bottle FULL (6 kg gas + steel)",      14.0, -210),
+    ("Cradle, stone guard, straps",                     7.0, -210),
     ("Gas piping, quick-connects, niches",              4.0, 1400),
 
-    # --- Kitchen ---
-    ("Kitchen drawer + 150 kg slides",                 22.0, 1700),
-    ("12V compressor fridge (e.g., Dometic CFX3 45)",  19.0, 1700),
-    ("Stove (stored) + utensils box",                   8.0, 1700),
+    # --- Galley (kitchen/storage LEFT, electrical bay/fridge RIGHT) ---
+    ("Kitchen side-drawer + 150 kg slides (front left)", 15.0, 320),
+    ("Storage cabinet plywood (mid left)",              10.0,  925),
+    ("Stove (stored) + utensils in cabinet",             8.0,  925),
+    ("Electrical bay cabinet plywood (mid right)",      10.0,  925),
+    ("Fridge drawer tray + slides (rear right)",         8.0, 1650),
+    ("12V compressor fridge (e.g., Dometic CFX3 45)",   19.0, 1650),
 ]
 
 

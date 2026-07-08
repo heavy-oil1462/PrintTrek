@@ -62,24 +62,39 @@ module trailer_cabin() {
         
     // 4. Väggar och Takskivor (Viss transparens för att se ramen)
     color("WhiteSmoke", 0.8) {
-        // Vänster vägg (med utskuret hål för el-nischen)
+        // Vänster vägg (köksutdrag + förrådsskåpslucka)
         difference() {
             translate([0, -wall_t, 50 + floor_t]) cube([frame_length, wall_t, cabin_height]);
-            // Urtag för nischen (Y stämmer med main_assembly placering)
-            translate([600, -wall_t - 1, 50 + floor_t + 200]) cube([160, wall_t + 2, 200]);
+            // Öppning för kökslådan (front vänster, drar ut i sidled)
+            translate([60, -wall_t - 1, 50 + floor_t]) cube([520, wall_t + 2, 330]);
+            // Öppning för förrådsskåpets lucka (bakom kökslådan)
+            translate([780, -wall_t - 1, 50 + floor_t + 50]) cube([460, wall_t + 2, 400]);
         }
-        
-        // Höger vägg
-        translate([0, frame_width, 50 + floor_t]) cube([frame_length, wall_t, cabin_height]);
+        // Förrådsskåpslucka (gångjärn i framkant, visas stängd)
+        color("Gainsboro")
+            translate([782, -wall_t, 50 + floor_t + 52]) cube([456, wall_t, 396]);
+
+        // Höger vägg (el-nisch + lucka till elfacket — allt elektriskt
+        // sitter på höger sida, framför kyllådan)
+        difference() {
+            translate([0, frame_width, 50 + floor_t]) cube([frame_length, wall_t, cabin_height]);
+            // Urtag för el-nischen (Y stämmer med main_assembly placering)
+            translate([600, frame_width - 1, 50 + floor_t + 200]) cube([160, wall_t + 2, 200]);
+            // Öppning för elfackets lucka (batteribox/central lyfts ut här)
+            translate([780, frame_width - 1, 50 + floor_t + 50]) cube([460, wall_t + 2, 400]);
+        }
+        // Elfackslucka (visas stängd)
+        color("Gainsboro")
+            translate([782, frame_width, 50 + floor_t + 52]) cube([456, wall_t, 396]);
         
         // Framvägg
         translate([-wall_t, 0, 50 + floor_t]) cube([wall_t, frame_width, cabin_height]);
         
-        // Bakvägg (T.ex. med lucka för köket/packningen)
+        // Bakvägg (baklucka ned till golvnivå så kyllådan kan dras ut)
         difference() {
             translate([frame_length, 0, 50 + floor_t]) cube([wall_t, frame_width, cabin_height]);
-            // Urtag för bakluckan
-            translate([frame_length - 1, 100, 50 + floor_t + 100]) cube([wall_t + 2, frame_width - 200, cabin_height - 200]);
+            // Urtag för bakluckan — tröskelfritt vid golvet för kylsläden
+            translate([frame_length - 1, 100, 50 + floor_t]) cube([wall_t + 2, frame_width - 200, cabin_height - 150]);
         }
         
         // Taket

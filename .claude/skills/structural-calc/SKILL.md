@@ -37,8 +37,16 @@ and copy any changed conclusion into SPECS.md (the sizing bullet under
 For joint details, plate buckling, frame torsion — see `fea/README.md`.
 
 ```bash
-scripts/run_ccx.sh fea/<deck>       # deck path WITHOUT the .inp extension
+scripts/run_fea.sh                  # full pipeline: solve ALL decks + render PNGs
+scripts/run_ccx.sh fea/<deck>       # single deck, path WITHOUT the .inp extension
+python3 scripts/plot_fea.py fea/*.frd   # renders: deformed shape + von Mises PNG
 ```
+
+Materials are per-part: steel `S355` (E=210000, nu=0.3) for VKR beams,
+aluminum `AL6082T6` (E=70000, nu=0.33) for CNC plates — keep new decks
+consistent. Rendering needs numpy+matplotlib; in this sandbox use the nix
+python env (`nix-build -E 'with import <nixpkgs> {}; python3.withPackages
+(ps: [ps.numpy ps.matplotlib])'`) and run it with `env -u LD_LIBRARY_PATH`.
 
 - ccx store path (2026-07): `/nix/store/6s7v4njrfr0jv79f5mxjggb58a7kjgxv-calculix-ccx-2.22`;
   the wrapper falls back to `nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A calculix --no-out-link`.

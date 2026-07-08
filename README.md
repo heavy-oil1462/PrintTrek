@@ -1,6 +1,19 @@
 # PrintTrek
 
-![Main Assembly](main_assembly.png)
+![Chassis — the load-bearing core](chassis.png)
+
+*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a single central VKR 100×50×4 drawbar lapped under the frame to the axle crossbeam, and a braked torsion axle matching the Ford Ranger's 1560 mm track. Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
+
+## Structural Analysis
+
+Hand-calcs (`python3 scripts/beam_check.py`) + CalculiX FEA, both validated against each other. Run the whole FEA pipeline on any machine with `scripts/run_fea.sh` (needs `ccx`; renders need `pip install numpy matplotlib`). Materials: S355 steel for all VKR beams, 6082-T6 aluminum for all CNC-milled plates.
+
+| | |
+|---|---|
+| ![Drawbar FEA](fea/drawbar_cantilever_stress.png) | ![Corner plate FEA](fea/corner_plate_bending_stress.png) |
+| **Drawbar** (steel, 3g tongue load): 85 MPa at the root, SF ≈ 4 on yield — matches the hand calc | **Corner plate** (aluminum, prying bound): 106 MPa at the clamp line, SF ≈ 2.5 even with one plate taking the full couple |
+
+The fatigue-governing detail is not the beam but the bolt hole at the front crossbeam lap (`check_joint_hole` in `beam_check.py`) — `cad/drawbar_cradle.scad` is a milled clamp-cradle that eliminates that hole entirely.
 
 **PrintTrek** is an open-source, highly engineered, and modular offroad adventure trailer designed to be manufactured using a custom CNC router (like the PrintNC) and basic hand tools.
 
@@ -26,14 +39,14 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
 - **Slide-Out Kitchen:** Accommodates a heavy-duty drawer (100-150kg slides) for a 12V compressor fridge (e.g., Dometic CFX), fed via an electrical-only energy chain. Propane stays on fixed pipes to external quick-connects for outdoor cooking.
 - **CAN-Bus Control System:** Arduino-based CAN nodes (relays + sensors), a Go backend on a Raspberry Pi, and a web dashboard for monitoring water level, battery voltage, and temperature, and for switching the pump, lights, and fridge remotely.
 
-## Design Snapshots
+## Design Snapshots (ideation-stage layout)
 
 | | |
 |---|---|
 | ![Main assembly](main_assembly.png) | ![Water tank + skid plate](water_tank.png) |
-| **Main assembly** — 2000×1200 mm bolted frame, single VKR 100x50x4 drawbar, slide-out kitchen | **Low-profile 40 L water tank** — 160 mm deep so the 3 mm skid plate sits level with the axle tube (~405 mm clearance) |
+| **Full assembly concept** — kitchen side-drawer front left, storage cabinet mid left, electrical bay mid right, fridge drawer out the rear right | **Low-profile 40 L water tank** — 160 mm deep so the 3 mm skid plate sits level with the axle tube (~405 mm clearance) |
 
-Renders are generated headlessly from the OpenSCAD sources with `scripts/render_scad.sh cad/<model>.scad <output>.png`.
+The body/galley layout is still being iterated and does not drive the structure. Renders are generated headlessly with `scripts/render_scad.sh cad/<model>.scad <output>.png` (chassis-only: add `-D show_cabin=false -D show_equipment=false`).
 
 ## Repository Structure
 

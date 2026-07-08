@@ -154,6 +154,47 @@ def check_side_rail(profile: RHS):
     return sf(s)
 
 
+def check_joint_hole(profile: RHS, d_hole=13.0):
+    """The REAL weak point of the bolted drawbar: the bolt hole through the
+    tension flange at the front crossbeam — exactly where the bending moment
+    peaks. Net-section loss is modest, but the hole is a stress raiser
+    (kt ~ 2.5) sitting at the fatigue hot spot."""
+    t = profile.t
+    half = profile.H / 2 - t / 2
+    dI = 2 * (d_hole * t) * half**2          # hole through both flanges
+    I_net = profile.I("strong") - dI
+    W_net = I_net / (profile.H / 2)
+
+    M = TONGUE_MASS * DYN_VERT * G * LEVER_VERT     # 3g event, Nm
+    s_gross = M * 1e3 / profile.W("strong")
+    s_net = M * 1e3 / W_net
+    kt = 2.5
+    s_peak = s_net * kt
+
+    # Fatigue: washboard driving cycles the tongue load roughly 0..2g.
+    M_fat = TONGUE_MASS * 2.0 * G * LEVER_VERT
+    ds_net = M_fat * 1e3 / W_net                    # nominal net-section range
+    CAT = 90.0   # EC3 detail category, net section at unfilled hole [MPa]
+
+    report(f"DRAWBAR JOINT — {d_hole:.0f} mm hole at the front crossbeam "
+           f"({profile.name})", [
+        f"W gross {profile.W('strong')/1e3:.1f} -> net {W_net/1e3:.1f} cm3 "
+        f"({100*(1 - W_net/profile.W('strong')):.0f}% loss)",
+        f"3g event:  gross {s_gross:.0f} / net {s_net:.0f} / "
+        f"peak at hole edge (kt={kt}) {s_peak:.0f} MPa   "
+        f"static SF = {sf(s_net):.1f}",
+        f"Fatigue:   2g washboard range = {ds_net:.0f} MPa net vs detail "
+        f"category ~{CAT:.0f} MPa -> {'OK' if ds_net < CAT else 'NOT OK'}"
+        f" (margin {CAT/ds_net:.2f}x)",
+        "-> Statically fine; FATIGUE is what governs this hole. A preloaded",
+        "   bolt + crush sleeve improves it (filled hole, load bypass via",
+        "   friction). Best fix: NO hole at the peak-moment joint — clamp",
+        "   the beam in a milled cradle instead (cad/drawbar_cradle.scad):",
+        "   vertical bolts pass BESIDE the beam, horizontal bolts through",
+        "   the webs at the NEUTRAL AXIS where bending stress is ~zero.",
+    ])
+
+
 def check_bolts():
     # Drawbar-to-crossbeam M12 8.8 through-bolts with crush sleeves.
     # Governing action: lap couple from LC2 + direct shear, single shear plane
@@ -201,6 +242,7 @@ def main():
     # Show why the original thin bar failed, and the next size up for margin:
     check_drawbar(PROFILES["VKR 50x50x3"])
     check_side_rail(PROFILES["VKR 50x50x3"])
+    check_joint_hole(PROFILES["VKR 100x50x4"])
     check_bolts()
 
     print("\nRule of thumb: SF >= 2.0 on yield for dynamic off-road cases.")

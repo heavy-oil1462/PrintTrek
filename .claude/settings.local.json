@@ -20,7 +20,28 @@
       "Bash(rm -f *.cvg *.sta *.12d spooles.out)",
       "Bash(./scripts/render_scad.sh cad/water_tank.scad water_tank.png)",
       "Bash(./scripts/render_scad.sh cad/main_assembly.scad main_assembly.png)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git reset *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git config *)",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/assembly.png)",
+      "Bash(echo \"cabin exit: $?\")",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/assembly_top.png --camera=1000,600,0,0,0,0,5500 --projection=o)",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/front_quarter.png --camera=-1400,-900,900,55,0,35,4000)",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/front_view.png --camera=-2800,600,700,200,600,250)",
+      "Bash(./scripts/render_scad.sh cad/kitchen_drawer.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/galley.stl)",
+      "Bash(awk '{print $5\" bytes\"}')",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad chassis.png -D show_cabin=false -D show_equipment=false)",
+      "Bash(python3 -c \"import numpy, matplotlib; print\\('numpy+matplotlib OK'\\)\")",
+      "Bash(nix-build *)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/6s7v4njrfr0jv79f5mxjggb58a7kjgxv-calculix-ccx-2.22/bin/ccx corner_plate_bending)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/plot_fea.py fea/drawbar_cantilever.frd fea/corner_plate_bending.frd)",
+      "Bash(python3 scripts/beam_check.py)",
+      "Bash(chmod +x scripts/run_fea.sh)",
+      "Bash(./scripts/render_scad.sh cad/drawbar_cradle.scad drawbar_cradle.png)",
+      "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 ./scripts/run_fea.sh)",
+      "Bash(git -c credential.helper='!gh auth git-credential' push origin main)"
     ]
   }
 }

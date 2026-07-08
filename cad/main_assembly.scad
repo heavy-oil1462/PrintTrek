@@ -27,9 +27,13 @@ frame_length = 2000;
 frame_width = 1200;   // Narrowed from 1400 to allow the Ranger's 1560 mm track
 
 // --- Display toggles ---
-show_cabin = true;        // Body/canopy (walls are semi-transparent)
-show_equipment = true;    // Wheels, tank, kitchen, gas, electrics, lights
-drawer_pullout = 300;     // Kitchen drawer extension for visualization (mm)
+show_cabin = true;         // Body/canopy (walls are semi-transparent)
+show_running_gear = true;  // Axle, wheels, fenders (LOAD-BEARING — part of the chassis view)
+show_equipment = true;     // Tank, kitchen, gas, electrics, lights (ideation-stage layout)
+drawer_pullout = 300;      // Kitchen drawer extension for visualization (mm)
+// Chassis-only render (the structural truth: frame + drawbar + plates + axle):
+//   scripts/render_scad.sh cad/main_assembly.scad chassis.png \
+//       -D show_cabin=false -D show_equipment=false
 
 // --- Drawbar geometry (must match frame.scad) ---
 // Single central beam, VKR 100x50x4 standing on edge, lapped under the
@@ -134,16 +138,18 @@ translate([frame_length*0.6 - tube_w/2, frame_width - tube_w, -plate_thickness])
 if (show_cabin) {
     trailer_cabin();
 
-    // Electrical niche recessed in the left Dibond wall (hole is cut in
-    // cabin.scad at x 600-760, z 265-465; wall outer face at y=-3)
+    // Electrical niche recessed in the RIGHT Dibond wall (hole is cut in
+    // cabin.scad at x 600-760, z 265-465; wall outer face at y=frame_width+3).
+    // All electrical lives on the right side, ahead of the fridge drawer.
     color("darkslategray")
-        translate([680, -3, 365]) rotate([90, 0, 0]) power_niche();
+        translate([680, frame_width + 3, 365]) mirror([0, 1, 0])
+            rotate([90, 0, 0]) power_niche();
 }
 
 // ==========================================
-// 5. Running Gear
+// 5. Running Gear (load-bearing)
 // ==========================================
-if (show_equipment) {
+if (show_running_gear) {
     // Braked torsion axle + 265/60R18 wheels
     torsion_axle(axle_x);
 
@@ -159,18 +165,54 @@ if (show_equipment) {
     // Water tank + skid plate, centered just ahead of the axle
     translate([950, frame_width/2, 0]) water_tank_assembly();
 
-    // Gas bottle cradle on the drawbar arms (bottle shown transparent)
-    translate([-550, frame_width/2, -plate_thickness]) gas_bottle_cradle();
-    %translate([-550, frame_width/2, 2]) color("orange", 0.6) {
+    // Gas bottle cradle on the drawbar, FLUSH against the front wall
+    // (bottle edge ~45 mm from the wall; the stone guard wraps the front)
+    translate([-210, frame_width/2, -plate_thickness]) gas_bottle_cradle();
+    %translate([-210, frame_width/2, 2]) color("orange", 0.6) {
         cylinder(d=300, h=350);
         translate([0, 0, 350]) cylinder(d1=300, d2=100, h=100);
     }
 
-    // Removable power station box, left front inside the cabin
-    translate([450, 180, 65 + 202]) battery_box();
+    // --- Layout (sides in TRAVEL direction; y=0 is the left wall) ---
+    // LEFT,  front -> rear: kitchen side-drawer | storage cabinet (utensils)
+    // RIGHT, front -> rear: electrical bay (battery box) | fridge drawer
 
-    // Slide-out kitchen at the rear (drawn partially extended)
-    translate([1150, (frame_width - 900)/2, 170]) kitchen_drawer(pullout = drawer_pullout);
+    // Kitchen side-drawer, front left, slides out -Y through the wall
+    translate([60, 0, 65]) kitchen_drawer(pullout = drawer_pullout);
+
+    // Storage cabinet (utensils/dry goods), mid left.
+    // Door in the left wall at x 780-1240.
+    translate([600, 0, 65]) storage_cabinet();
+
+    // Electrical bay, mid right, AHEAD of the fridge drawer: mirrored
+    // cabinet housing the removable power-station box. Door in the right
+    // wall at x 780-1240; the el-niche sits in its front bay (x 600-760).
+    translate([600, frame_width, 65]) mirror([0, 1, 0]) storage_cabinet();
+    translate([920, frame_width - 180, 65 + 15 + 202]) battery_box();
+
+    // Fridge drawer, rear right, slides out +X through the rear hatch
+    // (kept 110 mm off the right wall so the tray clears the hatch frame)
+    translate([1330, frame_width - 450 - 110, 65]) fridge_drawer(pullout = drawer_pullout);
+
+    // --- External connection points ---
+    // 230V CEE inlet: FRONT wall, right half, mounted HIGH — kept well
+    // clear (>500 mm) of all gas equipment (bottle low center, connects
+    // on the right wall). Interior feed runs in conduit along the front
+    // bulkhead to the left-side electrical cabinet.
+    color("RoyalBlue") translate([-6, 950, 680]) rotate([0, -90, 0]) {
+        cylinder(d = 60, h = 25);
+        translate([-45, -45, 0]) cube([90, 90, 4]);
+    }
+
+    // Gas quick-connects (GOK/Truma) in recessed niches on the RIGHT
+    // wall: one front, one rear. NOTE: gas-vs-electrical side separation
+    // is parked while the interior layout settles (2026-07) — these
+    // positions will be refined once the layout is frozen.
+    color("orange") for (x = [300, 1750])
+        translate([x, frame_width + 6, 250]) rotate([90, 0, 0]) {
+            cylinder(d = 40, h = 25);
+            translate([-40, -40, 0]) cube([80, 80, 4]);
+        }
 
     // Road equipment (UNECE R48): lamps, reflectors, plate, jockey wheel.
     // One row across the 1200 mm rear beam:

@@ -34,7 +34,7 @@
 - **Tank Protection:** 3 mm aluminum tread plate for underbody protection (skid plate).
 - **Filler:** External lockable water filler, drainage/winterization valve.
 - **Structure/Walls:** 12-15 mm form plywood (floor), 3-4 mm aluminum composite / Dibond (sides).
-- **Kitchen Module:** Heavy-duty drawer slides (100-150 kg capacity, lock-in/out), energy chain/cable carrier (electrical only — no gas hose in the chain).
+- **Galley Modules:** TWO pairs of heavy-duty drawer slides (100-150 kg capacity, lock-in/out): one pair for the front-left kitchen side-drawer, one pair for the rear-right fridge drawer. Plywood for the mid-left storage cabinet and the mid-right electrical bay + exterior door hardware x2 (hinges, compression latches, seals). Energy chains/cable carriers (electrical only — no gas hose in the chains).
 - **Appliances:** 12V compressor fridge (e.g., Dometic CFX3 or Engel MR040).
 
 ## Road Equipment (Registration Requirements)
