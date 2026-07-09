@@ -32,6 +32,10 @@ DRAWBAR_Z = -85.0        # 25 (half tube) + 10 (spacer/cradle web) + 50 (half ba
 COUPLING_X = -1090.0
 DECK_KG = 400.0
 G = 9.81
+# OPTIONAL floor crossbars at x=500/1500 — mirror of the toggle in
+# cad/main_assembly.scad. FEA verdict: frame-member stresses are
+# unchanged either way (they serve the floor, not the frame).
+FLOOR_CROSSBARS = True
 
 nodes = {}      # (x,y,z) -> id
 coords = []
@@ -71,6 +75,9 @@ railR = beam((0, FRAME_W, 0), (FRAME_L, FRAME_W, 0), 20, "RAILS")
 beam((0, 0, 0), (0, FRAME_W, 0), 12, "CROSS")
 beam((MID_X, 0, 0), (MID_X, FRAME_W, 0), 12, "CROSS")
 beam((FRAME_L, 0, 0), (FRAME_L, FRAME_W, 0), 12, "CROSS")
+if FLOOR_CROSSBARS:
+    beam((500, 0, 0), (500, FRAME_W, 0), 12, "CROSS")     # floor crossbar
+    beam((1500, 0, 0), (1500, FRAME_W, 0), 12, "CROSS")   # floor crossbar / tank hanger
 # No crossbeam over the axle: the bolted torsion-axle tube ties the
 # rails there. Its rail brackets (near x=1100) are the vertical supports.
 beam((COUPLING_X, FRAME_W / 2, DRAWBAR_Z), (0, FRAME_W / 2, DRAWBAR_Z), 20, "DRAWBAR")

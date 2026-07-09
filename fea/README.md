@@ -7,7 +7,9 @@ combined load paths). Solver: **CalculiX (ccx)**, open source.
 ## Run it (any host)
 
 ```bash
-scripts/run_fea.sh          # solves every fea/*.inp + renders PNGs
+scripts/regen_all.sh        # EVERYTHING: decks + solve + all PNGs + mass budget
+scripts/verify_design.sh    # read-only checks incl. FEA SF >= 1.5 (pre-commit)
+scripts/run_fea.sh          # just this: solves every fea/*.inp + renders PNGs
 ```
 
 The script finds `ccx` via `$CCX` → PATH → nix-build fallback
@@ -80,7 +82,7 @@ brackets) — max von Mises per member group:
 
 | Member group | max vM | SF vs 355 |
 |---|---|---|
-| Side rails | 130 MPa | 2.7 |
+| Side rails | 132 MPa | 2.7 |
 | Crossbeams | 27 MPa | 13 |
 | Drawbar | 19 MPa | 19* |
 | Angle pair / rear lap | 4 / 34 MPa | their governing case is the *lateral* couple (~118 MPa, SF 3.0, `check_angle_joint`), not this vertical LC |
@@ -89,7 +91,12 @@ brackets) — max von Mises per member group:
 governing envelope — dynamic pitching loads the tongue independently of
 the deck. Note the rails took over from the deleted axle crossbeam:
 SF dropped from ~4 to 2.7 in this bounding case (full 400 kg payload at
-3g) — the price of one clean middle beam, still comfortable.
+3g) — the price of one clean middle beam, still comfortable. The two
+OPTIONAL floor crossbars (x=500/1500, `FLOOR_CROSSBARS` toggle in
+`scripts/gen_frame_fea.py`, mirrored in the CAD and mass budget) change
+frame-member stresses by ~nothing — verified here — their job is the
+formply floor span, lashing points, and the water-tank hanger, not the
+frame.
 
 **LC diagonal racking** (three corners held, fourth lifted 30 mm): rails
 65 / crossbeams 65 / drawbar 24 MPa; the rear-lap connector reads

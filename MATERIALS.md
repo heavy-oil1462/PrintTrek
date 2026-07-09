@@ -2,7 +2,7 @@
 
 ## Chassis & Mechanics
 - **Steel Profiles:** Square steel tubes VKR 50x50x3 mm (or 60x40x3 mm, incl. the mid crossmember for the drawbar lap); drawbar in VKR 100x50x4 mm (~2.1 m, standing on edge).
-- **Corner Plates:** Aluminum 6082-T6, 8-10 mm (for CNC milling).
+- **Corner Plates:** Aluminum 6082-T6, 8-10 mm (for CNC milling). T-plates: 4x for the mid crossbeam (top+bottom sandwich) + 4x bottom-only for the OPTIONAL floor crossbars at x=500/1500 (same CNC part; omit if the floor crossbars are toggled off).
 - **Fasteners:** Through-bolts M10/M12 in grade 8.8 or 10.9, lock nuts, hardened washers.
 - **Crush Sleeves:** Internal steel sleeves for every through-bolt (precision tube, e.g., 16x2.5 mm ID 11 for M10; 20x3 mm for M12), cut to the inner width of the VKR profile — required to reach full bolt preload without collapsing the 3 mm tube walls.
 - **Galvanic Corrosion Insulation:** Duralac anodic paste; optionally 0.5-1 mm G10/FR4 sheet as a rigid isolator. (No rubber/vinyl shims in structural joints — elastomers creep and kill bolt preload.)

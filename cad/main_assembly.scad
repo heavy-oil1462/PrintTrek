@@ -31,6 +31,9 @@ frame_width = 1200;   // Narrowed from 1400 to allow the Ranger's 1560 mm track
 show_cabin = true;         // Body/canopy (walls are semi-transparent)
 show_running_gear = true;  // Axle, wheels, fenders (LOAD-BEARING — part of the chassis view)
 show_equipment = true;     // Tank, kitchen, gas, electrics, lights (ideation-stage layout)
+floor_crossbars = true;    // OPTIONAL floor crossbars at x=500/1500 incl. their
+                           // T-plates (frame-neutral per FEA — floor span,
+                           // lashing, water-tank hanger). -D floor_crossbars=false
 drawer_pullout = 300;      // Kitchen drawer extension for visualization (mm)
 // Chassis-only render (the structural truth: frame + drawbar + plates + axle):
 //   scripts/render_scad.sh cad/main_assembly.scad chassis.png \
@@ -99,7 +102,7 @@ module place_t_plate() {
 // ==========================================
 
 // 1. Chassis (Steel Frame)
-trailer_frame();
+trailer_frame(floor_crossbars = floor_crossbars);
 
 // 3. CNC Corner Plates ("Double Sandwiches")
 // Front Left Corner
@@ -143,6 +146,19 @@ translate([975, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
 // Right side
 translate([975, frame_width - tube_w, tube_w]) rotate([0, 0, 90]) place_t_plate();
 translate([975, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
+
+// 3.7 T-plates for the OPTIONAL floor crossbars (x=500/1500).
+// BOTTOM plate only (same CNC part as the mid-crossbeam plates): these
+// bars are frame-neutral (see fea/README.md), so the joint only locates
+// the bar and carries floor load in bolt shear — no moment stiffness
+// needed. The top face stays flush so the formply floor screws straight
+// onto the tube and closes the joint from above.
+if (floor_crossbars) {
+    for (x = [500, 1500]) {
+        translate([x, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
+        translate([x, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
+    }
+}
 
 // ==========================================
 // 4. Body / Canopy

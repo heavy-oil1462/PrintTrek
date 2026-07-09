@@ -46,7 +46,19 @@
       "Bash(./scripts/render_scad.sh cad/main_assembly.scad /dev/null)",
       "Bash(sed -n '/ANGLE-BRACKET/,/interface/p')",
       "Bash(./scripts/render_scad.sh cad/drawbar_angle_joint.scad drawbar_angle_joint.png)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(./scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/top_chassis.png -D show_cabin=false -D show_equipment=false --camera=1000,600,0,0,0,0,4200 --projection=o)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/gen_frame_fea.py)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/calculate_mass.py)",
+      "Bash(command -v ccx)",
+      "Read(//nix/store/**)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/plot_fea.py fea/frame_global_3g.frd fea/frame_global_twist.frd)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad chassis.png -D show_cabin=false -D show_equipment=false)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad main_assembly.png)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_nobar.png -D show_cabin=false -D show_equipment=false -D floor_crossbars=false)",
+      "Bash(python3 *)",
+      "Bash(chmod +x scripts/regen_all.sh scripts/verify_design.sh)",
+      "Bash(scripts/verify_design.sh)"
     ]
   }
 }

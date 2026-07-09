@@ -44,7 +44,12 @@ bar_h = 100;             // Beam height (Z) - standing orientation for max W
 drawbar_end_x = 1020;
 drawbar_len = drawbar_reach + drawbar_end_x;   // 2020 mm total
 
-module trailer_frame() {
+// floor_crossbars: the two OPTIONAL floor crossbars (x 475-525 and
+// 1475-1525). FEA-verified frame-neutral — they serve the formply floor
+// span, lashing points and the water-tank hanger, so the frame is fully
+// valid without them. Toggle here or per-assembly:
+//   trailer_frame(floor_crossbars = false)
+module trailer_frame(floor_crossbars = true) {
     color("silver") {
         // Side rails (left and right)
         translate([0, 0, 0]) cube([frame_length, tube_w, tube_w]);
@@ -57,12 +62,26 @@ module trailer_frame() {
         translate([frame_length, tube_w, 0])
             rotate([0, 0, 90]) cube([frame_width - 2*tube_w, tube_w, tube_w]);
 
-        // Mid crossbeam (x 950-1000): the ONE middle beam. It takes the
-        // drawbar's rear lap bolt AND ties the rails ahead of the axle.
-        // No separate beam over the axle: the bolted torsion-axle tube
-        // (x 1070-1150) is itself a cross-tie via its rail brackets.
+        // Mid crossbeam (x 950-1000): takes the drawbar's rear lap bolt
+        // AND ties the rails ahead of the axle. No separate beam over
+        // the axle: the bolted torsion-axle tube (x 1070-1150) is
+        // itself a cross-tie via its rail brackets.
         translate([1000, tube_w, 0])
             rotate([0, 0, 90]) cube([frame_width - 2*tube_w, tube_w, tube_w]);
+
+        // OPTIONAL floor crossbars at ~500 mm spacing (beams at
+        // 0/500/975/1500/2000): these carry the 15 mm formply floor
+        // (unsupported spans drop from ~950 to ~475 mm under cargo point
+        // loads), give lashing/body mounting points, and the rear one
+        // doubles as the water-tank hanger (tank zone x 1125-1675).
+        // They clear the axle tube. Each end bolts to the rail through
+        // a bottom T-plate (see main_assembly.scad).
+        if (floor_crossbars) {
+            translate([525, tube_w, 0])
+                rotate([0, 0, 90]) cube([frame_width - 2*tube_w, tube_w, tube_w]);
+            translate([1525, tube_w, 0])
+                rotate([0, 0, 90]) cube([frame_width - 2*tube_w, tube_w, tube_w]);
+        }
 
         // Central drawbar (VKR 100x50x4, standing): sits plate_t below
         // the frame plane. 10 mm milled spacer plates fill the gap at

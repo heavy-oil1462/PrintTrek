@@ -22,6 +22,11 @@ COUPLING_X = -1060           # mm, coupling point (drawbar_reach + head)
 # (food, gear, firewood, tools...). Included in the total-weight check.
 PAYLOAD_ALLOWANCE = 150      # kg
 
+# OPTIONAL floor crossbars at x=500/1500 (frame-neutral per FEA; they
+# serve the formply floor span, lashing, and the water-tank hanger).
+# Mirror of the `floor_crossbars` toggle in cad/main_assembly.scad.
+FLOOR_CROSSBARS = True
+
 # (name, mass_kg, x_mm of the component's center of gravity)
 COMPONENTS = [
     # --- Chassis (steel, hot-dip galvanized: raw mass x ~1.06) ---
@@ -38,6 +43,19 @@ COMPONENTS = [
     ("T-plates mid crossbeam 4x (~1.5 kg ea)",          6.0,  975),
     ("Drawbar wedge/spacer plates",                     3.0,  100),
     ("Drawbar angle brackets 2x L80x80x8 x 120 mm",     2.3,   25),
+]
+
+if FLOOR_CROSSBARS:
+    COMPONENTS += [
+        ("Floor crossbar 1.1 m VKR 50x50x3",               5.0,  500),
+        ("Floor crossbar (tank hanger) 1.1 m VKR 50x50x3", 5.0, 1500),
+        # Bottom T-plate per end (same CNC part as the mid-crossbeam
+        # plates); the formply floor closes the joint from above.
+        ("T-plates floor crossbars 4x bottom (~1.5 kg)",   3.0,  500),
+        ("T-plates floor crossbars (rear pair)",           3.0, 1500),
+    ]
+
+COMPONENTS += [
 
     # --- Running gear ---
     ("Torsion axle, braked, 6x139.7 + dampers",        75.0, AXLE_X),

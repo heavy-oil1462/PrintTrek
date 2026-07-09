@@ -37,7 +37,9 @@ and copy any changed conclusion into SPECS.md (the sizing bullet under
 For joint details, plate buckling, frame torsion — see `fea/README.md`.
 
 ```bash
-scripts/run_fea.sh                  # full pipeline: solve ALL decks + render PNGs
+scripts/regen_all.sh                # ALL derived artifacts: decks + solve + renders + budget
+scripts/verify_design.sh            # read-only pre-commit gate (see the `verify` skill)
+scripts/run_fea.sh                  # FEA only: solve ALL decks + render PNGs
 scripts/run_ccx.sh fea/<deck>       # single deck, path WITHOUT the .inp extension
 python3 scripts/plot_fea.py fea/*.frd   # renders: deformed shape + von Mises PNG
 ```
