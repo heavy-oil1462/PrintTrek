@@ -28,18 +28,21 @@ step() { echo; echo "== $*"; }
 bad()  { echo "   [FAIL] $*"; FAIL=1; }
 ok()   { echo "   [ok] $*"; }
 
-step "[1/5] CAD renders (both floor_crossbars states)"
-if scripts/render_scad.sh cad/main_assembly.scad "$TMP/on.png" >/dev/null 2>&1; then
-    ok "floor_crossbars=true renders"
+step "[1/5] CAD renders (all design-toggle states)"
+if scripts/render_scad.sh cad/main_assembly.scad "$TMP/def.png" >/dev/null 2>&1; then
+    ok "default toggles render (cad/design_params.scad)"
 else
     bad "cad/main_assembly.scad does not render (default toggles)"
 fi
-if scripts/render_scad.sh cad/main_assembly.scad "$TMP/off.png" \
-        -D floor_crossbars=false >/dev/null 2>&1; then
-    ok "floor_crossbars=false renders"
-else
-    bad "cad/main_assembly.scad does not render with floor_crossbars=false"
-fi
+for ovr in "floor_crossbars=true" "floor_crossbars=false" \
+           "v_drawbar=true" "v_drawbar=false"; do
+    if scripts/render_scad.sh cad/main_assembly.scad "$TMP/ovr.png" \
+            -D "$ovr" >/dev/null 2>&1; then
+        ok "$ovr renders"
+    else
+        bad "cad/main_assembly.scad does not render with $ovr"
+    fi
+done
 
 step "[2/5] FEA deck drift (gen_frame_fea.py vs committed fea/*.inp)"
 mkdir -p "$TMP/gen/fea"

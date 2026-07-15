@@ -20,6 +20,8 @@ use <road_equipment.scad>
 use <gas_box.scad>
 use <battery_box.scad>
 use <drawbar_angle_joint.scad>
+use <v_apex_plate.scad>
+use <drawbar_wedge_plate.scad>
 
 // --- System Parameters ---
 $fn = 60;
@@ -27,24 +29,26 @@ tube_w = 50;
 frame_length = 2000;
 frame_width = 1200;   // Narrowed from 1400 to allow the Ranger's 1560 mm track
 
-// --- Display toggles ---
+// --- Design toggles (floor_crossbars, v_drawbar, ...) ---
+// Single source of truth shared with the Python pipeline — edit THERE:
+include <design_params.scad>
+
+// --- Display toggles (view-only, local to this file) ---
 show_cabin = true;         // Body/canopy (walls are semi-transparent)
 show_running_gear = true;  // Axle, wheels, fenders (LOAD-BEARING — part of the chassis view)
 show_equipment = true;     // Tank, kitchen, gas, electrics, lights (ideation-stage layout)
-floor_crossbars = true;    // OPTIONAL floor crossbars at x=500/1500 incl. their
-                           // T-plates (frame-neutral per FEA — floor span,
-                           // lashing, water-tank hanger). -D floor_crossbars=false
 drawer_pullout = 300;      // Kitchen drawer extension for visualization (mm)
 // Chassis-only render (the structural truth: frame + drawbar + plates + axle):
 //   scripts/render_scad.sh cad/main_assembly.scad chassis.png \
 //       -D show_cabin=false -D show_equipment=false
 
 // --- Drawbar geometry (must match frame.scad) ---
-// Single central beam, VKR 100x50x4 standing on edge, lapped under the
-// frame back to the mid crossbeam (x 950-1000). Sizing math in frame.scad.
+// DEFAULT: V-drawbar, two straight 50x50x3 arms to the coupling apex.
+// Legacy single bar (v_drawbar=false): VKR 100x50x4 standing on edge,
+// lapped back to the mid crossbeam. Sizing math in frame.scad.
 drawbar_reach = 1000;
-bar_w = 50;
-bar_h = 100;
+bar_w = 50;      // single-bar width (Y)
+bar_h = 100;     // single-bar height (Z)
 
 // --- Axle/wheel geometry (must match wheel_axle.scad) ---
 // axle_x = the wheel-center line (AXLE_X in the mass budget). The
@@ -102,7 +106,13 @@ module place_t_plate() {
 // ==========================================
 
 // 1. Chassis (Steel Frame)
-trailer_frame(floor_crossbars = floor_crossbars);
+trailer_frame(floor_crossbars = floor_crossbars, v_drawbar = v_drawbar);
+
+// V-drawbar geometry (must match frame.scad)
+v_attach_x = 600;
+v_arm_dx = v_attach_x + drawbar_reach;   // 1600
+v_arm_dy = frame_width/2 - tube_w/2;     // 575
+v_theta = atan(v_arm_dy / v_arm_dx);     // ~19.8 deg arm half-angle
 
 // 3. CNC Corner Plates ("Double Sandwiches")
 // Front Left Corner
@@ -122,20 +132,54 @@ translate([frame_length, frame_width, tube_w]) rotate([0, 0, 180]) place_corner(
 translate([frame_length, frame_width, -plate_thickness]) rotate([0, 0, 180]) place_corner();
 
 // 3.5 Drawbar lap joints (structural — part of the chassis view)
-// FRONT crossbeam: angle-bracket clamp (2x L80x80x8 + spacer plate,
-// see drawbar_angle_joint.scad) — NO holes in the beam flanges at the
-// peak-moment point; web bolts at the neutral axis. Fatigue rationale
-// in scripts/beam_check.py (check_joint_hole / check_angle_joint).
-translate([tube_w/2, frame_width/2, 0]) drawbar_angle_joint();
+if (!v_drawbar) {
+    // FRONT crossbeam: angle-bracket clamp (2x L80x80x8 + spacer plate,
+    // see drawbar_angle_joint.scad) — NO holes in the beam flanges at the
+    // peak-moment point; web bolts at the neutral axis. Fatigue rationale
+    // in scripts/beam_check.py (check_joint_hole / check_angle_joint).
+    translate([tube_w/2, frame_width/2, 0]) drawbar_angle_joint();
 
-// MID crossbeam (x 950-1000): plain through-bolted rear lap + 10 mm
-// spacer (bending moment ~zero here; the through-bolt gives positive
-// longitudinal location). The beam ends at x=1020, short of the
-// torsion-axle tube (x 1070-1150) which crosses at the same depth.
-// drawbar_wedge_plate.scad remains for the V-drawbar alternative.
-color("gold")
-    translate([950, frame_width/2 - bar_w/2, -plate_thickness])
-        cube([tube_w, bar_w, plate_thickness]);
+    // MID crossbeam (x 950-1000): plain through-bolted rear lap + 10 mm
+    // spacer (bending moment ~zero here; the through-bolt gives positive
+    // longitudinal location). The beam ends at x=1020, short of the
+    // torsion-axle tube (x 1070-1150) which crosses at the same depth.
+    color("gold")
+        translate([950, frame_width/2 - bar_w/2, -plate_thickness])
+            cube([tube_w, bar_w, plate_thickness]);
+} else {
+    // V-DRAWBAR joint hardware (all CNC plates, no welds, no miter cuts):
+    // one simple trapezoidal apex plate top+bottom ties the square-cut
+    // arm ends; wedge spacer plates fill the 10 mm gap at each angled
+    // lap (front-crossbeam crossing + side-rail ends). At the CROSSBEAM
+    // crossing the arm is at peak bending moment, so it is CLAMPED with
+    // M12 square U-bolts (no holes in the arm flanges there — fatigue,
+    // see check_v_joints in beam_check.py); through-bolts at the rail
+    // ends and apex, where arm moment is ~zero. Coupling-head mounting
+    // deliberately not modeled yet (open design point).
+    color("gold") {
+        // Apex sandwich: origin = arm centerline convergence point
+        translate([-drawbar_reach, frame_width/2, -plate_thickness])
+            v_apex_plate(theta = v_theta);
+        translate([-drawbar_reach, frame_width/2, -(tube_w + 2*plate_thickness)])
+            v_apex_plate(theta = v_theta);
+
+        for (s = [-1, 1]) {
+            // Front-crossbeam crossing (arm centerline at +/-368 mm off center)
+            translate([tube_w/2,
+                       frame_width/2 + s * v_arm_dy * (drawbar_reach + tube_w/2) / v_arm_dx,
+                       -plate_thickness])
+                rotate([0, 0, 90])
+                    drawbar_wedge_plate(angle = 90 + s * v_theta);
+
+            // Side-rail lap at the arm's rear end (wedge center pulled
+            // 60 mm apex-ward so the parallelogram sits on the tube)
+            translate([v_attach_x - 60 * cos(v_theta),
+                       frame_width/2 + s * (v_arm_dy - 60 * sin(v_theta)),
+                       -plate_thickness])
+                drawbar_wedge_plate(angle = 180 + s * v_theta);
+        }
+    }
+}
 
 // 3.6 T-plates for the mid crossbeam (x 950-1000: drawbar rear lap +
 // rail tie ahead of the axle — the one middle beam of the frame)
@@ -147,15 +191,14 @@ translate([975, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
 translate([975, frame_width - tube_w, tube_w]) rotate([0, 0, 90]) place_t_plate();
 translate([975, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
 
-// 3.7 T-plates for the OPTIONAL floor crossbars (x=500/1500).
-// BOTTOM plate only (same CNC part as the mid-crossbeam plates): these
-// bars are frame-neutral (see fea/README.md), so the joint only locates
-// the bar and carries floor load in bolt shear — no moment stiffness
-// needed. The top face stays flush so the formply floor screws straight
-// onto the tube and closes the joint from above.
+// 3.7 T-plates for the OPTIONAL floor crossbars (x=500/1500, off by
+// default): same top+bottom double sandwich as the mid crossbeam —
+// same CNC part, same joint everywhere in the frame.
 if (floor_crossbars) {
     for (x = [500, 1500]) {
+        translate([x, tube_w, tube_w]) rotate([0, 0, -90]) place_t_plate();
         translate([x, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
+        translate([x, frame_width - tube_w, tube_w]) rotate([0, 0, 90]) place_t_plate();
         translate([x, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
     }
 }
@@ -198,10 +241,23 @@ if (show_equipment) {
 
     // Caravan-style gas locker box on the drawbar, flush against the
     // front wall (box rear face ~25 mm from the wall). Houses the P6
-    // bottle + regulator; low-level vents per EN 1949; clamped to the
-    // beam — no holes in the drawbar. Replaces the open cradle + stone
-    // guard (cad/gas_bottle_mount.scad kept as the budget alternative).
-    translate([-230, frame_width/2, -plate_thickness]) gas_box();
+    // bottle + regulator; low-level vents per EN 1949. Replaces the open
+    // cradle + stone guard (gas_bottle_mount.scad kept as alternative).
+    // V-drawbar (default): the box bolts onto two 10 mm alu bearer
+    // plates spanning the arms — MORE mounting room than the single
+    // bar, and still no holes in any drawbar member.
+    if (v_drawbar) {
+        for (bx = [-380, -80]) {
+            gb_w = 2 * (v_arm_dy * (bx + drawbar_reach) / v_arm_dx + 30);
+            color("gold")
+                translate([bx - 50, frame_width/2 - gb_w/2, -plate_thickness])
+                    cube([100, gb_w, plate_thickness]);
+        }
+        translate([-230, frame_width/2, 0]) gas_box(mount = "plate");
+    } else {
+        // Legacy single-bar mount: bearers + U-straps around the beam
+        translate([-230, frame_width/2, -plate_thickness]) gas_box();
+    }
 
     // --- Layout (sides in TRAVEL direction; y=0 is the left wall) ---
     // LEFT,  front -> rear: kitchen side-drawer | storage cabinet (utensils)
@@ -252,9 +308,15 @@ if (show_equipment) {
     translate([2003, 220, -20]) triangle_reflector();
     translate([2003, 850, -20]) triangle_reflector();
     translate([2003, 360, -25]) number_plate();
-    // Jockey wheel clamped to the drawbar
-    translate([-800, frame_width/2, -plate_thickness])
-        jockey_wheel();
+    // Jockey wheel: V-drawbar -> clamped to the LEFT arm (standard
+    // A-frame practice); single bar -> on the centerline beam.
+    if (v_drawbar)
+        translate([-800, frame_width/2 - v_arm_dy * (-800 + drawbar_reach) / v_arm_dx,
+                   -plate_thickness])
+            rotate([0, 0, -v_theta]) jockey_wheel();
+    else
+        translate([-800, frame_width/2, -plate_thickness])
+            jockey_wheel();
 
     // NO spare wheel on the trailer: the wheel spec matches the Ford
     // Ranger exactly (6x139.7, 265/60R18 on original rims), so the

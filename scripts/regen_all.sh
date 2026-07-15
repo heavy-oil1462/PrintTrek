@@ -19,6 +19,19 @@ cd "$(dirname "$0")/.."
 PY="${PYTHON:-python3}"
 PYRUN=(env); case "$PY" in /nix/store/*) PYRUN=(env -u LD_LIBRARY_PATH);; esac
 
+# Design toggles live in cad/design_params.scad (single source of truth).
+# Env-var overrides (UPPERCASE name, e.g. FLOOR_CROSSBARS=true) already
+# reach the Python steps via scripts/design_params.py; forward them to
+# the OpenSCAD renders as -D flags so all consumers see the same values.
+D_FLAGS=()
+while read -r name; do
+    up=$(printf '%s' "$name" | tr '[:lower:]' '[:upper:]')
+    if [ -n "${!up:-}" ]; then
+        D_FLAGS+=(-D "$name=${!up}")
+        echo "   (env override: $name=${!up})"
+    fi
+done < <(sed -n 's/^[[:space:]]*\([a-z_][a-z0-9_]*\)[[:space:]]*=.*;.*/\1/p' cad/design_params.scad)
+
 echo "== [1/4] FEA decks (scripts/gen_frame_fea.py)"
 "${PYRUN[@]}" "$PY" scripts/gen_frame_fea.py
 

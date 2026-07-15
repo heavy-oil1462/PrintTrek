@@ -15,13 +15,16 @@
  *   - Bottle strapped upright; regulator + hose inside; fixed pipe
  *     exits through the floor gland and runs to the right-side rail.
  *
- * MOUNTING (respects the no-holes-in-the-drawbar rule): two aluminum
- * bearers sit ON the beam and are CLAMPED around it with U-straps —
- * the forward drawbar still carries near-peak bending moment, so it
- * must not be drilled.
+ * MOUNTING, two variants (mount parameter):
+ *   "beam"  — legacy single-bar mount: two aluminum bearers sit ON the
+ *             beam, CLAMPED around it with U-straps (the forward
+ *             drawbar carries near-peak bending moment — no drilling).
+ *   "plate" — V-drawbar mount (DEFAULT design): the box bolts flat
+ *             onto the two bearer plates that span the V arms (see
+ *             main_assembly.scad) — no bearers/straps of its own.
  *
- * Origin: center of the drawbar top face under the box center,
- * beam axis along X (like drawbar_angle_joint.scad). Box hangs in +Z.
+ * Origin: center of the mounting face under the box center, travel
+ * axis along X. Box grows in +Z.
  */
 
 bar_w = 50;
@@ -43,9 +46,9 @@ module rounded_box(size, r) {
     }
 }
 
-module gas_box() {
-    // Mounting bearers, clamped around the beam with U-straps
-    color("Silver") for (x = [-box_d/2 + 50, box_d/2 - 50]) {
+module gas_box(mount = "beam") {
+    // Beam mount only: bearers clamped around the beam with U-straps
+    if (mount == "beam") color("Silver") for (x = [-box_d/2 + 50, box_d/2 - 50]) {
         translate([x - 20, -bearer_l/2, 0]) cube([40, bearer_l, bearer_h]);
         // U-strap hint wrapping the beam sides
         for (s = [-1, 1])
@@ -53,7 +56,7 @@ module gas_box() {
                 cube([30, 4, 60 + bearer_h]);
     }
 
-    translate([0, 0, bearer_h]) {
+    translate([0, 0, mount == "beam" ? bearer_h : 0]) {
         // Body
         color("Gainsboro")
             difference() {
@@ -85,7 +88,7 @@ module gas_box() {
     }
 
     // Ghost bottle inside
-    %color("orange", 0.5) translate([0, -60, bearer_h + 15]) {
+    %color("orange", 0.5) translate([0, -60, (mount == "beam" ? bearer_h : 0) + 15]) {
         cylinder(d = 300, h = 350);
         translate([0, 0, 350]) cylinder(d1 = 300, d2 = 100, h = 100);
         translate([0, 0, 450]) cylinder(d = 100, h = 50);

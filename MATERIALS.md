@@ -1,15 +1,16 @@
 # Material & Component List (BOM)
 
 ## Chassis & Mechanics
-- **Steel Profiles:** Square steel tubes VKR 50x50x3 mm (or 60x40x3 mm, incl. the mid crossmember for the drawbar lap); drawbar in VKR 100x50x4 mm (~2.1 m, standing on edge).
-- **Corner Plates:** Aluminum 6082-T6, 8-10 mm (for CNC milling). T-plates: 4x for the mid crossbeam (top+bottom sandwich) + 4x bottom-only for the OPTIONAL floor crossbars at x=500/1500 (same CNC part; omit if the floor crossbars are toggled off).
+- **Steel Profiles:** Square steel tubes VKR 50x50x3 mm — ONE profile for the whole trailer: rails, crossbeams, AND the two V-drawbar arms (2x ~1.6 m, straight square cuts only). (Legacy single-bar alternative: drawbar in VKR 100x50x4 mm, ~2.1 m, standing on edge.)
+- **Corner Plates:** Aluminum 6082-T6, 8-10 mm (for CNC milling). T-plates: 4x for the mid crossbeam (top+bottom sandwich) + 8x for the OPTIONAL floor crossbars at x=500/1500 (same CNC part, same top+bottom sandwich; omit if the floor crossbars are toggled off — they are OFF by default).
+- **V-Drawbar Plates (6082-T6, 10 mm):** 2x apex plates (`cad/v_apex_plate.scad`, top+bottom sandwich over the arm tips, ~1.2 kg ea); 4x wedge spacer plates (`cad/drawbar_wedge_plate.scad`) for the angled laps at the front crossbeam and rail ends; 2x gas-box bearer plates spanning the arms.
 - **Fasteners:** Through-bolts M10/M12 in grade 8.8 or 10.9, lock nuts, hardened washers.
 - **Crush Sleeves:** Internal steel sleeves for every through-bolt (precision tube, e.g., 16x2.5 mm ID 11 for M10; 20x3 mm for M12), cut to the inner width of the VKR profile — required to reach full bolt preload without collapsing the 3 mm tube walls.
 - **Galvanic Corrosion Insulation:** Duralac anodic paste; optionally 0.5-1 mm G10/FR4 sheet as a rigid isolator. (No rubber/vinyl shims in structural joints — elastomers creep and kill bolt preload.)
 - **Wheels & Axle:** Braked torsion axle (overrun brakes, e.g., Knott/AL-KO) with 6x139.7 bolt pattern + shock absorber (damper) kit + matching overrun coupling with breakaway cable.
 - **Tires/Rims:** Falken Wildpeak A/T3W 265/60R18 on Ford Ranger original rims (x2 — no spare on the trailer; the Ranger's underslung spare serves both).
-- **Gas Locker Box:** Caravan-style drawbar box for the P6 bottle (off-the-shelf poly, Fiamma/Thule class, or CNC-folded aluminum tread plate), with low-level ventilation per EN 1949, lockable lid, internal strap points; 2x aluminum bearers + U-straps to clamp it around the drawbar (no holes in the beam).
-- **Drawbar Joint (front crossbeam):** 2x steel angle L80x80x8 (S355), 120 mm long, hot-dip galvanized — clamp joint, no holes in the beam flanges. (Alternatives: CNC-milled 6082-T6 cradle, or M12 square U-bolts + top plate.)
+- **Gas Locker Box:** Caravan-style drawbar box for the P6 bottle (off-the-shelf poly, Fiamma/Thule class, or CNC-folded aluminum tread plate), with low-level ventilation per EN 1949, lockable lid, internal strap points. Mounting on the V-drawbar: bolts onto 2x 10 mm aluminum bearer plates spanning the two arms (single-bar alternative: bearers + U-straps clamped around the beam — no holes in any drawbar member either way).
+- **Drawbar Joint (front crossbeam):** 4x M12 square U-bolts (fyrkantbygel for 50 mm profile, 2 per V-arm crossing) + saddle strips — clamp joint, no holes in the arm flanges at the peak-moment point (`check_v_joints`). (Legacy single-bar joint: 2x steel angle L80x80x8 S355, 120 mm, hot-dip galvanized; or CNC-milled 6082-T6 cradle.)
 
 ## Electrical System & Electronics (Left Side)
 - **Cable Protection:** Corrugated conduit (automotive grade).

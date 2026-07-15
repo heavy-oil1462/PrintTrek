@@ -31,9 +31,13 @@ Pipeline order (each step wraps its own tool discovery — $CCX/PATH/nix,
   `fea/*_stress.png`) are build products of this pipeline — regenerate
   them in the same change that alters their sources, never edit around
   them.
-- Design toggles must stay in sync in THREE places:
-  `cad/main_assembly.scad` (e.g. `floor_crossbars`),
-  `scripts/calculate_mass.py` (`FLOOR_CROSSBARS`),
-  `scripts/gen_frame_fea.py` (`FLOOR_CROSSBARS`).
+- Design toggles live in ONE file: `cad/design_params.scad`. The CAD
+  includes it; the Python scripts parse it via `scripts/design_params.py`.
+  Never re-introduce per-file copies. One-off overrides: UPPERCASE env
+  vars (`FLOOR_CROSSBARS=true scripts/regen_all.sh` — forwarded to the
+  renders as `-D`), or `-D name=value` for a single OpenSCAD render.
+  A PERSISTENT change is an edit to `design_params.scad`, regenerated
+  and committed with its artifacts — never commit decks/renders built
+  from env overrides.
 - Finish with `scripts/verify_design.sh` (see the `verify` skill) before
   any commit.

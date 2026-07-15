@@ -144,6 +144,150 @@ def check_drawbar(profile: RHS):
     return sf(worst)
 
 
+def check_v_drawbar(profile: RHS, attach_x=0.600, apex_x=-1.000,
+                    coupling_x=-1.090, half_spread=0.575, cross_x=0.025):
+    """V-drawbar (A-frame) alternative: two straight square-cut tubes from
+    the coupling apex, bolted under the front crossbeam and the side-rail
+    ends. No welds, no miter cuts — the apex is tied by a CNC-milled
+    V-plate top+bottom sandwich (cad/v_apex_plate.scad) and the angled
+    laps get wedge spacer plates (cad/drawbar_wedge_plate.scad).
+
+    Why it beats the single bar: the lateral load case (which governs the
+    single bar as weak-axis bending + a lap couple) resolves into pure
+    AXIAL tension/compression through the triangle. Vertical tongue load
+    splits over two arms. Geometry defaults match cad/frame.scad."""
+    import math
+    dx = attach_x - apex_x                       # 1.600 m plan run
+    theta = math.atan2(half_spread, dx)          # arm half-angle ~19.8 deg
+    # arm crossing point under the front crossbeam (offset from centerline)
+    y_cross = half_spread * (cross_x - apex_x) / dx
+    lever1 = math.hypot(cross_x - coupling_x, y_cross)   # coupling -> crossing
+    back = math.hypot(attach_x - cross_x, half_spread - y_cross)  # crossing -> rail end
+    arm_free = (cross_x - apex_x) / math.cos(theta)      # apex -> crossing, along arm
+
+    out = [f"Profile: 2x {profile.name} straight arms "
+           f"(half-angle {math.degrees(theta):.1f} deg, "
+           f"~{(math.hypot(dx, half_spread)):.2f} m each, "
+           f"{2*math.hypot(dx, half_spread)*profile.mass_per_m:.1f} kg the pair)"]
+
+    # LC1 — vertical: dynamic tongue load shared by both arms
+    M1 = (TONGUE_MASS / 2) * DYN_VERT * G * lever1        # Nm per arm
+    s1 = M1 * 1e3 / profile.W("strong")
+    out.append(f"LC1 vertical  {DYN_VERT:.0f}g x {TONGUE_MASS:.0f} kg over 2 arms x "
+               f"{lever1:.2f} m = {M1:.0f} Nm/arm -> {s1:.0f} MPa   SF = {sf(s1):.2f}")
+
+    # LC2 — lateral: resolves AXIALLY through the V (one arm tension,
+    # one compression) instead of weak-axis bending
+    F2 = DYN_LAT * TOTAL_MASS * G
+    N = F2 / (2 * math.sin(theta))
+    s2 = N / profile.area
+    out.append(f"LC2 lateral   {F2:.0f} N -> AXIAL {N/1e3:.1f} kN per arm "
+               f"-> {s2:.0f} MPa   SF = {sf(s2):.0f}  (single bar: bending!)")
+
+    # Buckling of the compression arm (pinned apex -> crossbeam crossing)
+    Pcr = math.pi**2 * 210000 * profile.I("weak") / (arm_free * 1e3)**2
+    out.append(f"Arm buckling  Pcr = {Pcr/1e3:.0f} kN vs {N/1e3:.1f} kN "
+               f"-> SF = {Pcr/N:.0f}")
+
+    # LC3 — combined: 2g vertical + full lateral (linear interaction)
+    s3 = (2.0 / DYN_VERT) * s1 + s2
+    out.append(f"LC3 combined  2g vertical + LC2 lateral -> {s3:.0f} MPa   "
+               f"SF = {sf(s3):.2f}")
+
+    # Front crossbeam bending from the arm's vertical reaction at the
+    # crossing (load lands at y_cross instead of mid-span like the single bar)
+    R = (TONGUE_MASS / 2) * DYN_VERT * G * (lever1 + back) / back
+    # two symmetric loads R at +/- y_cross, supports at the rail
+    # centerlines (+/- half_spread): M under the load = R x edge distance
+    M_cb = R * (half_spread - y_cross)   # Nm
+    s_cb = M_cb * 1e3 / PROFILES["VKR 50x50x3"].W("strong")
+    out.append(f"Crossbeam     reaction {R/1e3:.1f} kN at {1000*y_cross:.0f} mm "
+               f"off-center -> {M_cb:.0f} Nm -> {s_cb:.0f} MPa   SF = {sf(s_cb):.2f}")
+
+    worst = max(s1, s2, s3)
+    verdict = "OK" if sf(worst) >= 2.0 else "!! SF < 2.0 — upsize or steepen the V"
+    out.append(f"Worst case:   {worst:.0f} MPa vs S355 -> SF = {sf(worst):.2f}   [{verdict}]")
+    out.append("Same profile as the frame -> ONE tube size for the whole trailer;")
+    out.append("no lap couple into the mid crossbeam (frees the space under the deck).")
+    report(f"V-DRAWBAR (A-frame) — 2x {profile.name}, straight square-cut arms", out)
+    return sf(worst)
+
+
+def check_v_joints(attach_x=0.600, apex_x=-1.000, coupling_x=-1.090,
+                   half_spread=0.575, cross_x=0.025):
+    """Bolt preload & FRICTION-GRIP budget for the V-drawbar's bolted
+    joints. The global FEA idealizes joints as rigid shared nodes and
+    does NOT model bolts (gen_frame_fea.py header) — THIS check is where
+    the bolts live.
+
+    Design philosophy the numbers below verify: torque every M12 to full
+    preload (the crush sleeves exist exactly so the RHS walls survive
+    that), and the PRELOAD FRICTION carries all service loads — the
+    bolts never work in shear/bearing, the plates never slip, and the
+    holes stay clamped shut (which is also the fatigue story)."""
+    import math
+    profile = PROFILES["VKR 50x50x3"]
+    dx = attach_x - apex_x
+    theta = math.atan2(half_spread, dx)
+    y_cross = half_spread * (cross_x - apex_x) / dx
+    lever1 = math.hypot(cross_x - coupling_x, y_cross)
+    back = math.hypot(attach_x - cross_x, half_spread - y_cross)
+
+    # --- demands (N), from the same geometry as check_v_drawbar -------
+    F_ax = DYN_LAT * TOTAL_MASS * G / (2 * math.sin(theta))  # LC2 axial/arm
+    F_v = (TONGUE_MASS / 2) * DYN_VERT * G                   # 3g vertical/arm
+    R_cb = F_v * (lever1 + back) / back                      # crossbeam lap
+    R_rail = R_cb - F_v                                      # rail-end lap
+    D_apex = math.hypot(F_ax, F_v)
+    D_cb = math.hypot(F_ax, R_cb)      # all axial dumped at one lap (conservative)
+    D_rail = math.hypot(F_ax, R_rail)
+
+    # --- capacity: M12 8.8 at FULL preload, friction grip -------------
+    A_s = 84.3                                   # mm2 stress area
+    Fp = 0.7 * FUB_8_8 * A_s                     # EC3 F_p,C = 47.2 kN
+    torque = 0.16 * 12.0 * Fp / 1e3              # Nm, lightly oiled (K=0.16)
+    mu = 0.2   # conservative: galvanized zinc / milled 6082 with Duralac
+    slip = mu * Fp                               # per bolt, per interface
+    cap_apex = 2 * 2 * slip   # 2 bolts/arm x 2 planes (top+bottom plate)
+    cap_lap = 2 * slip        # 2 bolts, stack interfaces in series
+
+    out = [
+        f"Preload: M12 8.8 F_p,C = 0.7 x fub x As = {Fp/1e3:.1f} kN "
+        f"(~{torque:.0f} Nm, needs the crush sleeves)",
+        f"Slip capacity per bolt & interface: mu={mu} x Fp = {slip/1e3:.1f} kN",
+        f"Apex plates  demand {D_apex/1e3:.1f} kN vs grip {cap_apex/1e3:.1f} kN"
+        f"   SF = {cap_apex/D_apex:.1f}  (2 bolts x 2 faying planes)",
+        f"Crossbeam lap demand {D_cb/1e3:.1f} kN vs grip {cap_lap/1e3:.1f} kN"
+        f"   SF = {cap_lap/D_cb:.1f}",
+        f"Rail-end lap  demand {D_rail/1e3:.1f} kN vs grip {cap_lap/1e3:.1f} kN"
+        f"   SF = {cap_lap/D_rail:.1f}",
+        f"(bolt SHEAR capacity if friction were lost entirely: "
+        f"{0.6*FUB_8_8*A_s/1e3:.1f} kN/plane — an order above any demand)",
+    ]
+
+    # --- fatigue: why the CROSSBEAM lap must be a CLAMP ----------------
+    # The crossbeam crossing is the arm's peak-moment point. A 13 mm hole
+    # through the flanges there fails the fatigue check; a clamp (square
+    # U-bolts + the wedge plate, no holes in the arm) passes with margin.
+    d_hole, t = 13.0, profile.t
+    half = profile.H / 2 - t / 2
+    W_net = (profile.I("strong") - 2 * (d_hole * t) * half**2) / (profile.H / 2)
+    M_fat = (TONGUE_MASS / 2) * 2.0 * G * lever1 * 1e3       # 2g washboard, Nmm
+    ds_hole = M_fat / W_net                                  # EC3 cat ~90
+    ds_gross = M_fat / profile.W("strong")                   # plain member cat ~160
+    out += [
+        f"Fatigue at the crossbeam crossing (arm peak moment, 2g range):",
+        f"  with 13 mm flange holes: {ds_hole:.0f} MPa vs cat 90 -> "
+        f"{'OK' if ds_hole < 90 else 'NOT OK'} — so NO holes there;",
+        f"  clamped (square U-bolts, no holes): {ds_gross:.0f} MPa vs "
+        f"cat 160 -> OK (margin {160/ds_gross:.2f}x)",
+        "  -> DECIDED: crossbeam lap = M12 square U-bolt clamp + wedge",
+        "     plate; through-bolts only at the rail ends and apex plates",
+        "     (arm moment ~zero there — holes are harmless).",
+    ]
+    report("V-DRAWBAR JOINTS — preload, friction grip, fatigue", out)
+
+
 def check_side_rail(profile: RHS):
     # Each rail carries half the deck payload as a UDL; governing span is
     # front crossbeam -> axle-bracket support (rear of frame is a cantilever
@@ -274,8 +418,12 @@ def main():
         print(f"  {p.name:<14} A={p.area:6.0f} mm2  {p.mass_per_m:4.1f} kg/m  "
               f"W_strong={p.W('strong')/1e3:5.1f} cm3  W_weak={p.W('weak')/1e3:5.1f} cm3")
 
+    # THE drawbar (DEFAULT design): V of two 50x50x3 arms + its joints
+    check_v_drawbar(PROFILES["VKR 50x50x3"])
+    check_v_joints()
+    # Legacy comparison: the single central bar it replaced, and why one
+    # thin bar alone never worked:
     check_drawbar(PROFILES["VKR 100x50x4"])
-    # Show why the original thin bar failed, and the next size up for margin:
     check_drawbar(PROFILES["VKR 50x50x3"])
     check_side_rail(PROFILES["VKR 50x50x3"])
     check_joint_hole(PROFILES["VKR 100x50x4"])

@@ -2,7 +2,7 @@
 
 ![Chassis — the load-bearing core](chassis.png)
 
-*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a single central VKR 100×50×4 drawbar lapped under the frame to a mid crossmember (clamped at the front, through-bolted at the rear), and a braked torsion axle matching the Ford Ranger's 1560 mm track. Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
+*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a **V-drawbar** of two straight square-cut arms in the SAME 50×50×3 profile — tied at the apex by a flat CNC plate sandwich (no welds, no miter cuts), U-bolt-clamped at the front crossbeam, through-bolted at the rail ends — and a braked torsion axle matching the Ford Ranger's 1560 mm track. Lateral towing loads go AXIAL through the triangle instead of bending a single beam (combined-case SF 3.0 vs 1.8). Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
 
 ## Structural Analysis
 
@@ -11,11 +11,11 @@ Hand-calcs (`python3 scripts/beam_check.py`) + CalculiX FEA, both validated agai
 | | |
 |---|---|
 | ![Whole chassis, 3g](fea/frame_global_3g_stress.png) | ![Whole chassis, racking](fea/frame_global_twist_stress.png) |
-| **Whole chassis, 3g deck load** — rails 132 / crossbeams 26 / drawbar 19 MPa, **SF ≥ 2.7 on every member** (bounding: full 400 kg at 3g); front lap modeled as the L80×80×8 angle pair (4 MPa here — its governing case is the lateral couple, SF 3.0) | **Whole chassis, diagonal racking** (one corner lifted 30 mm) — 64/65 MPa; the bolted ladder frame is torsionally soft, which is what you want off-road |
+| **Whole chassis, 3g deck load** — rails 130 / crossbeams 15 / V-arms 32 MPa, **SF ≥ 2.7 on every member** (bounding: full 400 kg at 3g); bolted laps appear as connectors (19 MPa — bolt preload/friction budget in `check_v_joints`) | **Whole chassis, diagonal racking** (one corner lifted 30 mm) — 71/69 MPa; the bolted ladder frame is torsionally soft, which is what you want off-road |
 | ![Drawbar FEA](fea/drawbar_cantilever_stress.png) | ![Corner plate FEA](fea/corner_plate_bending_stress.png) |
-| **Drawbar** (steel, 3g tongue load): 85 MPa at the root, SF ≈ 4 on yield — matches the hand calc | **Corner plate** (aluminum, prying bound): 106 MPa at the clamp line, SF ≈ 2.5 even with one plate taking the full couple |
+| **Single-bar drawbar** (legacy variant, kept as solver validation): 85 MPa at the root, SF ≈ 4 — matches the hand calc | **Corner plate** (aluminum, prying bound): 106 MPa at the clamp line, SF ≈ 2.5 even with one plate taking the full couple |
 
-The fatigue-governing detail is not the beam but the bolt hole at the front crossbeam lap (`check_joint_hole` in `beam_check.py`). The fix is a clamp joint with **no holes in the beam flanges**: two L80×80×8 steel angles (`cad/drawbar_angle_joint.scad`, budget option), a CNC-milled cradle (`cad/drawbar_cradle.scad`), or square U-bolts — same concept, pick by budget/tooling. Per-member tables and model notes in [`fea/README.md`](fea/README.md).
+The fatigue-governing detail of any bolted drawbar is a bolt hole at the peak-moment point (`check_joint_hole` / `check_v_joints` in `beam_check.py`), so the rule everywhere is **no holes where bending peaks**: the V-arms are U-bolt-CLAMPED at the front-crossbeam crossing and through-bolted only at the rail ends and apex plates, where arm moment is ~zero. Every structural bolt runs at full preload on a crush sleeve, so service loads are carried by **friction grip** (SF ≥ 3.9, `check_v_joints`) — the bolts never work in shear and the holes stay clamped shut. Per-member tables and model notes in [`fea/README.md`](fea/README.md).
 
 **PrintTrek** is an open-source, highly engineered, and modular offroad adventure trailer designed to be manufactured using a custom CNC router (like the PrintNC) and basic hand tools.
 

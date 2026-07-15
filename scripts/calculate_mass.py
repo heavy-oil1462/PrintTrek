@@ -22,37 +22,56 @@ COUPLING_X = -1060           # mm, coupling point (drawbar_reach + head)
 # (food, gear, firewood, tools...). Included in the total-weight check.
 PAYLOAD_ALLOWANCE = 150      # kg
 
+# Design toggles come from the single source cad/design_params.scad
+# (env vars override, e.g. FLOOR_CROSSBARS=true — see design_params.py).
+from design_params import PARAMS
+
 # OPTIONAL floor crossbars at x=500/1500 (frame-neutral per FEA; they
 # serve the formply floor span, lashing, and the water-tank hanger).
-# Mirror of the `floor_crossbars` toggle in cad/main_assembly.scad.
-FLOOR_CROSSBARS = True
+FLOOR_CROSSBARS = PARAMS["floor_crossbars"]
+# Drawbar variant: V-drawbar (DEFAULT) or the legacy single central bar.
+V_DRAWBAR = PARAMS["v_drawbar"]
 
 # (name, mass_kg, x_mm of the component's center of gravity)
 COMPONENTS = [
     # --- Chassis (steel, hot-dip galvanized: raw mass x ~1.06) ---
     ("Side rails 2x 2.0 m VKR 50x50x3 (4.31 kg/m)",   18.3, 1000),
     ("Front crossbeam 1.1 m VKR 50x50x3",              5.0,   25),
-    ("Mid crossbeam (drawbar lap) 1.1 m VKR 50x50x3",  5.0,  975),
+    ("Mid crossbeam 1.1 m VKR 50x50x3",                5.0,  975),
     ("Rear crossbeam 1.1 m VKR 50x50x3",               5.0, 1975),
-    ("Central drawbar 2.02 m VKR 100x50x4 (8.6 kg/m)", 18.4,   10),
     ("Coupling head (type-approved) + bolts",           4.0, COUPLING_X),
     ("Crush sleeves, bolts, nuts, washers",             6.0,  900),
 
     # --- Aluminum plates (6082-T6) ---
     ("Corner plates 8x 200x200x10 (1.08 kg ea)",        8.6, 1000),
     ("T-plates mid crossbeam 4x (~1.5 kg ea)",          6.0,  975),
-    ("Drawbar wedge/spacer plates",                     3.0,  100),
-    ("Drawbar angle brackets 2x L80x80x8 x 120 mm",     2.3,   25),
 ]
+
+if V_DRAWBAR:
+    COMPONENTS += [
+        # V-drawbar (DEFAULT): two straight square-cut arms, same profile
+        # as the frame; apex-plate sandwich + wedge plates at the laps.
+        ("V-drawbar arms 2x 1.56 m VKR 50x50x3",       13.5, -135),
+        ("Apex plates 2x 10 mm 6082-T6 (~1.2 kg ea)",   2.3, -780),
+        ("Wedge spacer plates 4x (laps at beam+rails)",  0.6,  300),
+        ("Gas-box bearer plates 2x across the V arms",   3.3, -230),
+    ]
+else:
+    COMPONENTS += [
+        # Legacy single central bar
+        ("Central drawbar 2.02 m VKR 100x50x4 (8.6 kg/m)", 18.4,   10),
+        ("Drawbar wedge/spacer plates",                     3.0,  100),
+        ("Drawbar angle brackets 2x L80x80x8 x 120 mm",     2.3,   25),
+    ]
 
 if FLOOR_CROSSBARS:
     COMPONENTS += [
         ("Floor crossbar 1.1 m VKR 50x50x3",               5.0,  500),
         ("Floor crossbar (tank hanger) 1.1 m VKR 50x50x3", 5.0, 1500),
-        # Bottom T-plate per end (same CNC part as the mid-crossbeam
-        # plates); the formply floor closes the joint from above.
-        ("T-plates floor crossbars 4x bottom (~1.5 kg)",   3.0,  500),
-        ("T-plates floor crossbars (rear pair)",           3.0, 1500),
+        # Top+bottom T-plate sandwich per end, like the mid crossbeam
+        # (same CNC part, 4 plates per bar at ~1.5 kg each).
+        ("T-plates floor crossbar front 4x (~1.5 kg ea)",  6.0,  500),
+        ("T-plates floor crossbar rear 4x (~1.5 kg ea)",   6.0, 1500),
     ]
 
 COMPONENTS += [
@@ -114,6 +133,7 @@ def main():
 
     print("==================================================")
     print(" PrintTrek Weight & Tongue-Load Budget")
+    print(f" Drawbar: {'V (A-frame, 2x 50x50x3)' if V_DRAWBAR else 'single central 100x50x4'}")
     print("==================================================\n")
 
     width = max(len(name) for name, _, _ in COMPONENTS)

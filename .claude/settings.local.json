@@ -58,7 +58,18 @@
       "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_nobar.png -D show_cabin=false -D show_equipment=false -D floor_crossbars=false)",
       "Bash(python3 *)",
       "Bash(chmod +x scripts/regen_all.sh scripts/verify_design.sh)",
-      "Bash(scripts/verify_design.sh)"
+      "Bash(scripts/verify_design.sh)",
+      "Bash(scripts/regen_all.sh)",
+      "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/run_fea.sh)",
+      "Bash(env -u LD_LIBRARY_PATH /nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 -c \"import numpy, matplotlib; print\\('ok'\\)\")",
+      "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 bash -c 'echo \"PYTHON=$PYTHON\"')",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad v_drawbar_concept.png -D show_cabin=false -D show_equipment=false -D v_drawbar=true)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_default.png -D show_cabin=false -D show_equipment=false)",
+      "Bash(scripts/render_scad.sh cad/v_apex_plate.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/v_apex_plate.png)",
+      "Bash(FLOOR_CROSSBARS=true V_DRAWBAR=false python3 scripts/calculate_mass.py)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad v_drawbar_concept.png -D show_cabin=false -D show_equipment=false)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_single.png -D show_cabin=false -D show_equipment=false -D v_drawbar=false)",
+      "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/regen_all.sh)"
     ]
   }
 }
