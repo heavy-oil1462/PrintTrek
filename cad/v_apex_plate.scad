@@ -16,7 +16,7 @@
  *
  * Local origin = the arms' centerline convergence point; the apex
  * points toward -X, symmetric about y=0. The square-cut tube tips sit
- * ~140 mm out from the origin (frame.scad: v_tip_trim), leaving a
+ * ~152 mm out from the origin (frame.scad: v_tip_trim), leaving a
  * ~40 mm clear gap between the tubes at the apex — cut-length slack
  * for manufacturing/assembly; the plate pair bridges it.
  *
@@ -29,8 +29,8 @@ $fn = 60;
 module v_apex_plate(
     tube_w = 50,        // Width of the VKR arms
     plate_t = 10,       // Plate thickness (top and bottom are identical)
-    theta = 19.8,       // Arm half-angle, deg (frame.scad: atan(575/1600))
-    front_x = 115,      // Front edge (just ahead of the ~140 mm tube tips)
+    theta = 17.7,       // Arm half-angle, deg (frame.scad: atan(575/1800))
+    front_x = 140,      // Front edge (just ahead of the ~152 mm tube tips)
     back_x = 320,       // Rear edge along the centerline
     hole_dia = 13,      // M12 clearance, drilled/reamed after milling
     arm_holes = [180, 250]   // Hole positions along each arm centerline

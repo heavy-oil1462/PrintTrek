@@ -69,7 +69,14 @@
       "Bash(FLOOR_CROSSBARS=true V_DRAWBAR=false python3 scripts/calculate_mass.py)",
       "Bash(scripts/render_scad.sh cad/main_assembly.scad v_drawbar_concept.png -D show_cabin=false -D show_equipment=false)",
       "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_single.png -D show_cabin=false -D show_equipment=false -D v_drawbar=false)",
-      "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/regen_all.sh)"
+      "Bash(PYTHON=/nix/store/rq027rv7i69y4xxfai4hv1pszlaykf4h-python3-3.12.12-env/bin/python3 scripts/regen_all.sh)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_bolts.png -D show_cabin=false -D show_equipment=false)",
+      "Bash(scripts/render_scad.sh /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/zoom_crossing.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/zoom_crossing.png -D show_cabin=false -D show_equipment=false -D show_running_gear=false)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/chassis_clamp.png -D show_cabin=false -D show_equipment=false)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/bottom_view.png -D show_cabin=false -D show_equipment=false -D show_running_gear=false --camera=0,0,0,180,0,0,0)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/top_narrow.png -D show_cabin=false -D show_equipment=false -D show_running_gear=false --camera=0,0,0,0,0,0,0)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/gasbox_check.png -D show_cabin=false -D show_running_gear=false --camera=0,0,0,180,0,0,0)",
+      "Bash(grep *)"
     ]
   }
 }

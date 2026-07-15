@@ -36,11 +36,14 @@ module drawbar_wedge_plate(
                     cube([max_len, 2*tube_w + 40, plate_t]);
         }
 
-        // Two bolt holes along the arm centerline
-        for (s = [-1, 1])
-            rotate([0, 0, angle])
-                translate([s * hole_spacing/2, 0, -1])
-                    cylinder(d=hole_dia, h=plate_t + 2);
+        // Bolt holes along the arm centerline (hole_dia=0 -> plain
+        // wedge, e.g. under the clamped front-crossbeam crossing;
+        // hole_spacing=0 -> one central hole)
+        if (hole_dia > 0)
+            for (s = [-1, 1])
+                rotate([0, 0, angle])
+                    translate([s * hole_spacing/2, 0, -1])
+                        cylinder(d=hole_dia, h=plate_t + 2);
     }
 }
 

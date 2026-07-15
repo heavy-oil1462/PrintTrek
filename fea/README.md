@@ -85,15 +85,15 @@ brackets) — max von Mises per member group:
 | Member group | max vM | SF vs 355 |
 |---|---|---|
 | Side rails | 130 MPa | 2.7 |
-| Crossbeams | 15 MPa | 23 |
-| V arms (DRAWBAR) | 32 MPa | 11* |
-| Lap connectors (VJOINT) | 19 MPa | 19 — bolt-level check: `check_v_joints` |
+| Crossbeams | 16 MPa | 22 |
+| V arms (DRAWBAR) | 31 MPa | 11* |
+| Lap connectors (VJOINT) | 28 MPa | 13 — bolt-level check: `check_v_joints` |
 
-\* the isolated 3g-tongue case (166 MPa/arm, SF 2.1, `check_v_drawbar`)
+\* the isolated 3g-tongue case (164 MPa/arm, SF 2.2, `check_v_drawbar`)
 remains the arms' governing envelope — dynamic pitching loads the
 tongue independently of the deck. The rails govern the frame in this
 bounding case (full 400 kg payload at 3g), same as before: the V
-actually RELAXES the front crossbeam (27 → 15 MPa) because the coupling
+actually RELAXES the front crossbeam (27 → 16 MPa) because the coupling
 reaction enters at two crossing points instead of mid-span. The two
 OPTIONAL floor crossbars (x=500/1500, `floor_crossbars` toggle, OFF by
 default) change frame-member stresses by ~nothing — verified here —
@@ -101,7 +101,7 @@ their job is the formply floor span, lashing points, and the water-tank
 hanger, not the frame.
 
 **LC diagonal racking** (three corners held, fourth lifted 30 mm): rails
-71 / crossbeams 69 / V arms 56 MPa; the lap connectors read 60 MPa
+74 / crossbeams 70 / V arms 56 MPa; the lap connectors read 60 MPa
 (load-path indicators for the bolted joints). The open ladder frame is
 torsionally soft — good off-road, and stresses stay low. (A "one
 wheel up" case with a ball coupling is a near-rigid roll of the whole

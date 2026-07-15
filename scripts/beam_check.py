@@ -144,7 +144,7 @@ def check_drawbar(profile: RHS):
     return sf(worst)
 
 
-def check_v_drawbar(profile: RHS, attach_x=0.600, apex_x=-1.000,
+def check_v_drawbar(profile: RHS, attach_x=0.800, apex_x=-1.000,
                     coupling_x=-1.090, half_spread=0.575, cross_x=0.025):
     """V-drawbar (A-frame) alternative: two straight square-cut tubes from
     the coupling apex, bolted under the front crossbeam and the side-rail
@@ -213,7 +213,7 @@ def check_v_drawbar(profile: RHS, attach_x=0.600, apex_x=-1.000,
     return sf(worst)
 
 
-def check_v_joints(attach_x=0.600, apex_x=-1.000, coupling_x=-1.090,
+def check_v_joints(attach_x=0.800, apex_x=-1.000, coupling_x=-1.090,
                    half_spread=0.575, cross_x=0.025):
     """Bolt preload & FRICTION-GRIP budget for the V-drawbar's bolted
     joints. The global FEA idealizes joints as rigid shared nodes and
@@ -235,12 +235,12 @@ def check_v_joints(attach_x=0.600, apex_x=-1.000, coupling_x=-1.090,
 
     # --- demands (N), from the same geometry as check_v_drawbar -------
     F_ax = DYN_LAT * TOTAL_MASS * G / (2 * math.sin(theta))  # LC2 axial/arm
+    F_ax2 = F_ax / 2                   # axial shared by the two frame laps
     F_v = (TONGUE_MASS / 2) * DYN_VERT * G                   # 3g vertical/arm
     R_cb = F_v * (lever1 + back) / back                      # crossbeam lap
     R_rail = R_cb - F_v                                      # rail-end lap
     D_apex = math.hypot(F_ax, F_v)
-    D_cb = math.hypot(F_ax, R_cb)      # all axial dumped at one lap (conservative)
-    D_rail = math.hypot(F_ax, R_rail)
+    D_rail = math.hypot(F_ax2, R_rail)
 
     # --- capacity: M12 8.8 at FULL preload, friction grip -------------
     A_s = 84.3                                   # mm2 stress area
@@ -249,26 +249,33 @@ def check_v_joints(attach_x=0.600, apex_x=-1.000, coupling_x=-1.090,
     mu = 0.2   # conservative: galvanized zinc / milled 6082 with Duralac
     slip = mu * Fp                               # per bolt, per interface
     cap_apex = 2 * 2 * slip   # 2 bolts/arm x 2 planes (top+bottom plate)
-    cap_lap = 2 * slip        # 2 bolts, stack interfaces in series
+    # Crossing clamp: 2x M12 BESIDE the arm through the crossbeam, spacer
+    # sleeves, clamp plate under the arm. Sleeves are cut ~0.5 mm short
+    # so the arm stack takes the preload; credit only ONE bolt's worth
+    # of clamp on the arm (conservative), gripping both arm faces:
+    cap_cb = 2 * mu * Fp
+    cap_rail = slip           # single bolt (only one fits the overlap)
 
     out = [
         f"Preload: M12 8.8 F_p,C = 0.7 x fub x As = {Fp/1e3:.1f} kN "
-        f"(~{torque:.0f} Nm, needs the crush sleeves)",
+        f"(~{torque:.0f} Nm, needs the crush/spacer sleeves)",
         f"Slip capacity per bolt & interface: mu={mu} x Fp = {slip/1e3:.1f} kN",
-        f"Apex plates  demand {D_apex/1e3:.1f} kN vs grip {cap_apex/1e3:.1f} kN"
+        f"Apex plates   demand {D_apex/1e3:.1f} kN vs grip {cap_apex/1e3:.1f} kN"
         f"   SF = {cap_apex/D_apex:.1f}  (2 bolts x 2 faying planes)",
-        f"Crossbeam lap demand {D_cb/1e3:.1f} kN vs grip {cap_lap/1e3:.1f} kN"
-        f"   SF = {cap_lap/D_cb:.1f}",
-        f"Rail-end lap  demand {D_rail/1e3:.1f} kN vs grip {cap_lap/1e3:.1f} kN"
-        f"   SF = {cap_lap/D_rail:.1f}",
+        f"Crossing CLAMP: vertical {R_cb/1e3:.1f} kN by DIRECT BEARING "
+        f"(plate under / wedge over the arm);",
+        f"  friction takes the {F_ax2/1e3:.1f} kN axial share vs grip "
+        f"{cap_cb/1e3:.1f} kN   SF = {cap_cb/F_ax2:.1f}",
+        f"Rail-end lap  demand {D_rail/1e3:.1f} kN vs grip {cap_rail/1e3:.1f} kN"
+        f"   SF = {cap_rail/D_rail:.1f}  (single bolt)",
         f"(bolt SHEAR capacity if friction were lost entirely: "
         f"{0.6*FUB_8_8*A_s/1e3:.1f} kN/plane — an order above any demand)",
     ]
 
-    # --- fatigue: why the CROSSBEAM lap must be a CLAMP ----------------
+    # --- fatigue: why the CROSSBEAM lap is a CLAMP, not a bolt ---------
     # The crossbeam crossing is the arm's peak-moment point. A 13 mm hole
-    # through the flanges there fails the fatigue check; a clamp (square
-    # U-bolts + the wedge plate, no holes in the arm) passes with margin.
+    # through the flanges there fails the fatigue check; the clamp puts
+    # NO holes in the arm at all and passes with margin.
     d_hole, t = 13.0, profile.t
     half = profile.H / 2 - t / 2
     W_net = (profile.I("strong") - 2 * (d_hole * t) * half**2) / (profile.H / 2)
@@ -279,11 +286,14 @@ def check_v_joints(attach_x=0.600, apex_x=-1.000, coupling_x=-1.090,
         f"Fatigue at the crossbeam crossing (arm peak moment, 2g range):",
         f"  with 13 mm flange holes: {ds_hole:.0f} MPa vs cat 90 -> "
         f"{'OK' if ds_hole < 90 else 'NOT OK'} — so NO holes there;",
-        f"  clamped (square U-bolts, no holes): {ds_gross:.0f} MPa vs "
+        f"  clamped (no holes in the arm): {ds_gross:.0f} MPa gross vs "
         f"cat 160 -> OK (margin {160/ds_gross:.2f}x)",
-        "  -> DECIDED: crossbeam lap = M12 square U-bolt clamp + wedge",
-        "     plate; through-bolts only at the rail ends and apex plates",
-        "     (arm moment ~zero there — holes are harmless).",
+        "  The single rail-end and apex holes sit where arm moment is",
+        "  ~zero — harmless (and preloaded/filled).",
+        "  Geometry notes: square U-bolts DON'T fit the ~70 deg crossing",
+        "  (their legs land on the crossbeam's edges) and the shallow",
+        "  rail overlap only has edge distance for ONE bolt — hence the",
+        "  beside-the-arm clamp + single rail bolt.",
     ]
     report("V-DRAWBAR JOINTS — preload, friction grip, fatigue", out)
 

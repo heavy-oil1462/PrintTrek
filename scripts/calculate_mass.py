@@ -51,9 +51,9 @@ if V_DRAWBAR:
     COMPONENTS += [
         # V-drawbar (DEFAULT): two straight square-cut arms, same profile
         # as the frame; apex-plate sandwich + wedge plates at the laps.
-        ("V-drawbar arms 2x 1.56 m VKR 50x50x3",       13.5, -135),
+        ("V-drawbar arms 2x 1.74 m VKR 50x50x3",       15.0,  -25),
         ("Apex plates 2x 10 mm 6082-T6 (~1.2 kg ea)",   2.3, -780),
-        ("Wedge spacer plates 4x (laps at beam+rails)",  0.6,  300),
+        ("Wedge plates 4x + clamp plates/sleeves 2x",    1.1,  250),
         ("Gas-box bearer plates 2x across the V arms",   3.3, -230),
     ]
 else:

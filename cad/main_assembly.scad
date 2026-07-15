@@ -22,6 +22,7 @@ use <battery_box.scad>
 use <drawbar_angle_joint.scad>
 use <v_apex_plate.scad>
 use <drawbar_wedge_plate.scad>
+use <fasteners.scad>
 
 // --- System Parameters ---
 $fn = 60;
@@ -77,6 +78,29 @@ t_rect_max_x = 50;
 t_rect_min_y = -65;
 t_rect_max_y = 65;
 
+// Fastener helpers: one M10 through-bolt (with crush sleeve) in every
+// plate hole. Hole coordinates mirror corner_plate.scad /
+// t_plate.scad (rectangular variants) — keep in sync if the bolt
+// patterns there change.
+corner_plate_holes = [[80, 37], [125, 13], [170, 37], [25, 25],
+                      [37, 80], [13, 125], [37, 170]];
+t_plate_holes = [[37, 45], [13, 15], [37, -15], [13, -45],
+                 [-40, 12], [-100, -12],
+                 [-40, 45], [-40, -45], [-70, 45], [-70, -45],
+                 [-100, 45], [-100, -45]];
+
+module corner_bolts() {
+    for (h = corner_plate_holes)
+        translate([h[0], h[1], tube_w + plate_thickness])
+            stack_bolt(10, tube_w + 2 * plate_thickness);
+}
+
+module t_plate_bolts() {
+    for (h = t_plate_holes)
+        translate([h[0], h[1], tube_w + plate_thickness])
+            stack_bolt(10, tube_w + 2 * plate_thickness);
+}
+
 // Helper modules to simplify placement with parameters
 module place_corner() {
     corner_plate(
@@ -108,11 +132,19 @@ module place_t_plate() {
 // 1. Chassis (Steel Frame)
 trailer_frame(floor_crossbars = floor_crossbars, v_drawbar = v_drawbar);
 
-// V-drawbar geometry (must match frame.scad)
-v_attach_x = 600;
-v_arm_dx = v_attach_x + drawbar_reach;   // 1600
+// V-drawbar geometry (must match frame.scad). attach at 800 keeps the
+// V narrow enough that the crossing clamp bolts clear the 200x200
+// front corner plates (see frame.scad).
+v_attach_x = 800;
+v_arm_dx = v_attach_x + drawbar_reach;   // 1800
 v_arm_dy = frame_width/2 - tube_w/2;     // 575
-v_theta = atan(v_arm_dy / v_arm_dx);     // ~19.8 deg arm half-angle
+v_theta = atan(v_arm_dy / v_arm_dx);     // ~17.7 deg arm half-angle
+// arm-centerline offset from the trailer centerline at the front
+// crossbeam centerline (x = tube_w/2): ~327 mm
+v_cross_y = v_arm_dy * (drawbar_reach + tube_w/2) / v_arm_dx;
+// single rail-lap bolt: this far along the arm from its rear end (the
+// shallow-angle overlap parallelogram only has edge distance for ONE bolt)
+v_rail_bolt = 30;
 
 // 3. CNC Corner Plates ("Double Sandwiches")
 // Front Left Corner
@@ -151,11 +183,13 @@ if (!v_drawbar) {
     // one simple trapezoidal apex plate top+bottom ties the square-cut
     // arm ends; wedge spacer plates fill the 10 mm gap at each angled
     // lap (front-crossbeam crossing + side-rail ends). At the CROSSBEAM
-    // crossing the arm is at peak bending moment, so it is CLAMPED with
-    // M12 square U-bolts (no holes in the arm flanges there — fatigue,
-    // see check_v_joints in beam_check.py); through-bolts at the rail
-    // ends and apex, where arm moment is ~zero. Coupling-head mounting
-    // deliberately not modeled yet (open design point).
+    // crossing the arm is at peak bending moment, so it is CLAMPED
+    // without any holes in it: two M12 pass through the crossbeam
+    // BESIDE the arm, through spacer sleeves, into a plate under the
+    // arm (fatigue rule — see check_v_joints in beam_check.py). One
+    // through-bolt per rail end, two per arm at the apex, where arm
+    // moment is ~zero. Coupling-head mounting deliberately not modeled
+    // yet (open design point).
     color("gold") {
         // Apex sandwich: origin = arm centerline convergence point
         translate([-drawbar_reach, frame_width/2, -plate_thickness])
@@ -164,19 +198,61 @@ if (!v_drawbar) {
             v_apex_plate(theta = v_theta);
 
         for (s = [-1, 1]) {
-            // Front-crossbeam crossing (arm centerline at +/-368 mm off center)
-            translate([tube_w/2,
-                       frame_width/2 + s * v_arm_dy * (drawbar_reach + tube_w/2) / v_arm_dx,
-                       -plate_thickness])
+            // Front-crossbeam crossing (arm centerline ~327 mm off
+            // center): plain wedge (no holes — the clamp bolts pass
+            // BESIDE the arm, see the fasteners below)
+            translate([tube_w/2, frame_width/2 + s * v_cross_y, -plate_thickness])
                 rotate([0, 0, 90])
-                    drawbar_wedge_plate(angle = 90 + s * v_theta);
+                    drawbar_wedge_plate(angle = 90 + s * v_theta, hole_dia = 0);
 
-            // Side-rail lap at the arm's rear end (wedge center pulled
-            // 60 mm apex-ward so the parallelogram sits on the tube)
-            translate([v_attach_x - 60 * cos(v_theta),
-                       frame_width/2 + s * (v_arm_dy - 60 * sin(v_theta)),
+            // Clamp plate UNDER the arm at the crossing: the two bolts
+            // through the crossbeam pull it up via spacer sleeves and
+            // squeeze the arm between it and the wedge/crossbeam
+            translate([tube_w/2 - 30, frame_width/2 + s * v_cross_y - 70,
+                       -(tube_w + 2 * plate_thickness)])
+                cube([60, 140, plate_thickness]);
+
+            // Side-rail lap at the arm's rear end: ONE bolt hole (the
+            // shallow-angle overlap only has edge distance for one)
+            translate([v_attach_x - v_rail_bolt * cos(v_theta),
+                       frame_width/2 + s * (v_arm_dy - v_rail_bolt * sin(v_theta)),
                        -plate_thickness])
-                drawbar_wedge_plate(angle = 180 + s * v_theta);
+                drawbar_wedge_plate(angle = 180 + s * v_theta, hole_spacing = 0);
+        }
+    }
+
+    // V-drawbar fasteners (display hardware, sizing in check_v_joints):
+    for (s = [-1, 1]) {
+        // Apex plates: 2x M12 through-bolts per arm through the
+        // top plate / tube / bottom plate stack (arm moment ~zero here)
+        for (dd = [180, 250])
+            translate([-drawbar_reach + dd * cos(v_theta),
+                       frame_width/2 + s * dd * sin(v_theta), 0])
+                stack_bolt(12, tube_w + 2 * plate_thickness);
+
+        // Rail-end lap: ONE M12 down through rail + wedge + arm (the
+        // arm's far support — moment ~zero, the hole is harmless; the
+        // 19.8deg overlap parallelogram only fits one bolt anyway)
+        translate([v_attach_x - v_rail_bolt * cos(v_theta),
+                   frame_width/2 + s * (v_arm_dy - v_rail_bolt * sin(v_theta)),
+                   tube_w])
+            stack_bolt(12, 2 * tube_w + plate_thickness);
+
+        // Front-crossbeam crossing: CLAMP — 2x M12 through the
+        // CROSSBEAM 45 mm each side of the arm, down through 60 mm
+        // spacer sleeves into the clamp plate under the arm. NO holes
+        // in the arm at its peak-moment point (fatigue rule,
+        // check_v_joints), and nothing lands on a beam edge — the
+        // bolts have the crossbeam's whole length to sit on. (Square
+        // U-bolts do NOT fit here: at the ~70deg crossing their legs
+        // land exactly on the crossbeam's edges.)
+        for (cs = [-1, 1]) {
+            translate([tube_w/2, frame_width/2 + s * v_cross_y + cs * 45, tube_w])
+                stack_bolt(12, 2 * tube_w + 2 * plate_thickness);
+            color("Silver")
+                translate([tube_w/2, frame_width/2 + s * v_cross_y + cs * 45,
+                           -(tube_w + plate_thickness)])
+                    cylinder(d = 18, h = tube_w + plate_thickness, $fn = 32);
         }
     }
 }
@@ -200,8 +276,21 @@ if (floor_crossbars) {
         translate([x, tube_w, -plate_thickness]) rotate([0, 0, -90]) place_t_plate();
         translate([x, frame_width - tube_w, tube_w]) rotate([0, 0, 90]) place_t_plate();
         translate([x, frame_width - tube_w, -plate_thickness]) rotate([0, 0, 90]) place_t_plate();
+        translate([x, tube_w, 0]) rotate([0, 0, -90]) t_plate_bolts();
+        translate([x, frame_width - tube_w, 0]) rotate([0, 0, 90]) t_plate_bolts();
     }
 }
+
+// 3.8 Frame fasteners (display hardware): every plate hole gets its
+// M10 through-bolt + crush sleeve, so the mounting is readable
+// straight off the model. Same transforms as the plates above.
+corner_bolts();                                                    // front left
+translate([0, frame_width, 0]) rotate([0, 0, -90]) corner_bolts(); // front right
+translate([frame_length, 0, 0]) rotate([0, 0, 90]) corner_bolts(); // rear left
+translate([frame_length, frame_width, 0]) rotate([0, 0, 180]) corner_bolts(); // rear right
+
+translate([975, tube_w, 0]) rotate([0, 0, -90]) t_plate_bolts();   // mid crossbeam
+translate([975, frame_width - tube_w, 0]) rotate([0, 0, 90]) t_plate_bolts();
 
 // ==========================================
 // 4. Body / Canopy
@@ -247,11 +336,23 @@ if (show_equipment) {
     // plates spanning the arms — MORE mounting room than the single
     // bar, and still no holes in any drawbar member.
     if (v_drawbar) {
+        // Two 10 mm alu bearer plates under the box, spanning the arms:
+        // TRAPEZOIDS that follow the V taper, ending flush with the
+        // arms' outer edges — no sharp corners overhanging the tubes.
         for (bx = [-380, -80]) {
-            gb_w = 2 * (v_arm_dy * (bx + drawbar_reach) / v_arm_dx + 30);
+            w0 = v_arm_dy * (bx - 50 + drawbar_reach) / v_arm_dx
+                 + (tube_w/2) / cos(v_theta);   // half-width at the front edge
+            w1 = v_arm_dy * (bx + 50 + drawbar_reach) / v_arm_dx
+                 + (tube_w/2) / cos(v_theta);   // half-width at the rear edge
             color("gold")
-                translate([bx - 50, frame_width/2 - gb_w/2, -plate_thickness])
-                    cube([100, gb_w, plate_thickness]);
+                translate([0, frame_width/2, -plate_thickness])
+                    linear_extrude(plate_thickness)
+                        polygon([[bx - 50, -w0], [bx + 50, -w1],
+                                 [bx + 50,  w1], [bx - 50,  w0]]);
+            // one M10 through bearer + arm at each crossing
+            for (s = [-1, 1])
+                translate([bx, frame_width/2 + s * v_arm_dy * (bx + drawbar_reach) / v_arm_dx, 0])
+                    stack_bolt(10, plate_thickness + tube_w);
         }
         translate([-230, frame_width/2, 0]) gas_box(mount = "plate");
     } else {

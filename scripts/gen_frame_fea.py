@@ -55,7 +55,8 @@ V_DRAWBAR = PARAMS["v_drawbar"]
 
 # V-drawbar geometry (matches cad/frame.scad, in the FEA's rail-centerline
 # idealization: rails at y=0/FRAME_W, so the half-spread is FRAME_W/2)
-V_ATTACH_X = 600.0       # arm rear ends under the rails
+V_ATTACH_X = 800.0       # arm rear ends under the rails (narrow V: the
+                         # crossing clamp bolts must clear the corner plates)
 V_APEX_X = -1000.0       # arm centerline convergence (apex plates)
 V_Z = -35.0              # arm centerline: 10 (plate gap) + 25 (half tube)
 
@@ -116,7 +117,7 @@ if V_DRAWBAR:
     # V-drawbar: two straight arms, rail end -> crossbeam crossing ->
     # apex. Both arms SHARE the apex node = the top+bottom apex-plate
     # sandwich that ties them (cad/v_apex_plate.scad). The bolted laps
-    # (wedge plates + M12/U-bolt clamps) become short vertical
+    # (wedge plates + M12 bolts / sleeve clamps) become short vertical
     # connectors, elset VJOINT — their stress indicates joint loading.
     # APEX = the plate-pair nose region carrying the coupling head.
     for s in (-1, 1):

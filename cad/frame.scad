@@ -12,8 +12,9 @@
  *   lateral loads resolve AXIALLY through the triangle (6 MPa vs
  *   135 MPa weak-axis bending in the single bar); governing combined
  *   case SF 3.0 vs 1.8 for the single bar. Joints: preload friction
- *   carries everything (check_v_joints) — crossbeam lap is a U-bolt
- *   CLAMP (peak arm moment, no flange holes), rail/apex through-bolted.
+ *   carries everything (check_v_joints) — crossbeam lap is a sleeve-
+ *   CLAMP with the bolts beside the arm (peak arm moment, no holes in
+ *   the arm), rail ends single-bolted, apex plates through-bolted.
  *
  * SINGLE-BAR SIZING (legacy alternative):
  *   100 kg tongue load x 3g dynamic off-road factor x 1.09 m lever
@@ -55,22 +56,28 @@ drawbar_len = drawbar_reach + drawbar_end_x;   // 2020 mm total
 
 // --- V-drawbar (A-frame) — DEFAULT design ---
 // Two straight square-cut VKR 50x50x3 arms (same profile as the frame)
-// from the coupling apex, attached under the front crossbeam (U-bolt
-// clamp — peak arm moment, no flange holes) and the side-rail ends
-// (through-bolts). No welds, no miter cuts: the apex is tied by a CNC
-// plate top+bottom sandwich (v_apex_plate.scad) and the angled laps
-// get wedge spacer plates (drawbar_wedge_plate.scad).
-v_attach_x = 600;                          // arm rear ends under the rails
-v_arm_dx = v_attach_x + drawbar_reach;     // 1600 mm plan run
+// from the coupling apex, attached under the front crossbeam (sleeve-
+// clamp, bolts beside the arm — peak arm moment, no holes in the arm)
+// and the side-rail ends (one through-bolt each). No welds, no miter
+// cuts: the apex is tied by a CNC plate top+bottom sandwich
+// (v_apex_plate.scad) and the angled laps get wedge spacer plates
+// (drawbar_wedge_plate.scad).
+// Arm rear ends under the rails. 800 (not further forward!) keeps the
+// V narrow enough that the front-crossbeam clamp bolts clear the
+// 200x200 corner plates (crossing at ~327 mm off-center -> nearest
+// bolt ~282, plate ends at 200), and stays short of the mid-crossbeam
+// T-plates on the rails (x 910..1040).
+v_attach_x = 800;
+v_arm_dx = v_attach_x + drawbar_reach;     // 1800 mm plan run
 v_arm_dy = frame_width/2 - tube_w/2;       // 575 mm half spread
-v_arm_len = sqrt(v_arm_dx*v_arm_dx + v_arm_dy*v_arm_dy);   // ~1700 mm
-v_theta = atan(v_arm_dy / v_arm_dx);       // ~19.8 deg arm half-angle
+v_arm_len = sqrt(v_arm_dx*v_arm_dx + v_arm_dy*v_arm_dy);   // ~1890 mm
+v_theta = atan(v_arm_dy / v_arm_dx);       // ~17.7 deg arm half-angle
 // Square-cut tips stop short of each other: v_tip_gap of clear air
 // between the two tube corners at the apex, so cut-length tolerance
 // never makes the tubes press against each other — the apex plates
 // bridge the gap. (Manufacturing/assembly slack, deliberate.)
 v_tip_gap = 40;
-v_tip_trim = (v_tip_gap/2 + (tube_w/2)/cos(v_theta)) / sin(v_theta);  // ~138 mm
+v_tip_trim = (v_tip_gap/2 + (tube_w/2)/cos(v_theta)) / sin(v_theta);  // ~152 mm
 
 // floor_crossbars: the two OPTIONAL floor crossbars (x 475-525 and
 // 1475-1525), OFF by default. FEA-verified frame-neutral — they serve
