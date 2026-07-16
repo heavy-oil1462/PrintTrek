@@ -15,7 +15,7 @@ module corner_plate(
     plate_thickness = 10,    // Thickness of the aluminum plate (mm)
     tube_width = 50,         // Width of the VKR profile (steel frame)
     arm_length = 200,        // Total length of the plate arms from the outer corner
-    hole_dia = 11,           // Hole diameter for M10 bolts (drilled before galvanizing, reamed clean after — zinc adds ~100 µm per surface)
+    hole_dia = 13,           // Hole diameter for M12 bolts (drilled before galvanizing, reamed clean after — zinc adds ~100 µm per surface)
     outer_radius = 12,       // Rounding of outer corners
     tunnel_curve = 80        // Radius for the inner soft curve (cable shortcut). Also determines offset for perfect tangent.
 ) {
@@ -97,29 +97,28 @@ module corner_plate_rectangular(plate_thickness, tube_width, arm_length, hole_di
 }
 
 // --- Bolt Patterns ---
+// 2x M12 per arm on the flange CENTERLINE (was 3x M10 zig-zag at
+// +/-12 mm): the joints are friction-grip and never capacity-limited
+// (demand ~3-5 kN vs 38 kN slip per arm), but the zig-zag put hole
+// edges 7.5 mm from the tube edge — e2 = 1.18*d0, at the EN 1993-1-8
+// floor. Centered M12 gives e2 = 25 mm = 1.9*d0 and half the holes to
+// drill, ream after galvanizing, and sleeve. Two holes 90 mm apart on
+// a preloaded, sleeve-filled joint don't create the "perforation line"
+// the zig-zag guarded against; net section per plane is one hole
+// either way.
 module bolt_holes_x(plate_thickness, tube_width, hole_dia) {
-    // 3 bolts in zig-zag for the X-arm (prevents fracture along a single fiber/line in the steel)
-    for(i = [0 : 2]) {
-        x_pos = 80 + (i * 45);
-        y_pos = (i % 2 == 0) ? (tube_width/2 + 12) : (tube_width/2 - 12);
-        
-        translate([x_pos, y_pos, -1]) 
+    for(x_pos = [80, 170])
+        translate([x_pos, tube_width/2, -1])
             cylinder(d=hole_dia, h=plate_thickness + 2);
-    }
     // An extra bolt exactly in the joint point (center of the cross)
-    translate([tube_width/2, tube_width/2, -1]) 
+    translate([tube_width/2, tube_width/2, -1])
         cylinder(d=hole_dia, h=plate_thickness + 2);
 }
 
 module bolt_holes_y(plate_thickness, tube_width, hole_dia) {
-    // 3 bolts in zig-zag for the Y-arm
-    for(i = [0 : 2]) {
-        y_pos = 80 + (i * 45);
-        x_pos = (i % 2 == 0) ? (tube_width/2 + 12) : (tube_width/2 - 12);
-        
-        translate([x_pos, y_pos, -1]) 
+    for(y_pos = [80, 170])
+        translate([tube_width/2, y_pos, -1])
             cylinder(d=hole_dia, h=plate_thickness + 2);
-    }
 }
 
 // --- Visualization & Assembly (Not rendered as a printable part by default) ---

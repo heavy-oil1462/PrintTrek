@@ -54,12 +54,12 @@ Notes learned the hard way (do not rediscover these):
 
 ## Project design rules to verify
 
-- Bolt holes: 11 mm for M10, 13 mm for M12 (reamed after hot-dip galvanizing).
+- Bolt holes: 13 mm for M12 — ONE bolt size for every structural plate joint (reamed after hot-dip galvanizing). M10 (11 mm) survives only in non-structural mounts (gas-box bearers) and the legacy single-bar parts.
 - Every through-bolt in RHS gets an internal crush sleeve — joints must have straight-through access for sleeves.
 - Tube profiles: 50x50 mm (chassis), 40x40 mm (cabin). Plates: 8-10 mm 6082-T6.
-- Bolt hole edge distance: washer (Ø20 for M10) must sit fully on both plate and tube face.
-- Drawbar is a SINGLE central beam, VKR 100x50x4 standing on edge (~1000 mm reach), lapped under the frame to the MID crossmember (x 950-1000) and ending at x=1020 — it must NOT reach the torsion-axle tube (x 1070-1150, same depth). Front lap = angle-bracket clamp, rear lap = through-bolt. Sizing in frame.scad header and scripts/beam_check.py. (The V/A-frame is a preserved alternative, `drawbar_wedge_plate.scad`.)
-- Zig-zag (offset) bolt patterns along tubes — never a straight line of holes.
+- Bolt hole edge distance: washer (Ø24 for M12) must sit fully on both plate and tube face.
+- Drawbar: V/A-frame is the DEFAULT (`v_drawbar` in `cad/design_params.scad`) — two straight VKR 50x50x3 arms from the coupling apex, lapped under the front crossbeam (sleeve clamp, NO holes in the arm at the crossing) and the rail ends. The single central VKR 100x50x4 bar is the preserved legacy alternative (`v_drawbar=false`); if enabled it laps to the MID crossmember (x 950-1000), ends at x=1020, and must NOT reach the torsion-axle tube (x 1070-1150, same depth). Sizing in frame.scad header and scripts/beam_check.py.
+- Plate bolt patterns: 2x M12 per plate arm on the tube CENTERLINE (e2 = 1.9·d0; rationale in corner_plate.scad and check_plate_bolts in beam_check.py). The old 3x M10 zig-zag is retired — flag any NEW off-center hole that lands closer than 1.2·d0 to a tube edge.
 - Gas stays right side / electrical left side; the corner "cable tunnel" radius must stay ≥ the LMR coax bend radius (~80 mm). One documented exception: the 230V CEE inlet on the front wall's right half (high), >500 mm from gas equipment.
 - Galley order: LEFT front → rear: kitchen side-drawer (out through the left wall), storage cabinet. RIGHT: electrical bay, then fridge drawer out through a fridge-sized hatch on the rear RIGHT (500x520, sill-free at the floor) — the rest of the rear wall is solid. No spare wheel on the trailer (the Ranger's serves both).
 

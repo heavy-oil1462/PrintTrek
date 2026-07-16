@@ -7,7 +7,7 @@
  * the angled lap joint.
  *
  * Shape = the plan-view intersection of the two 50 mm wide tubes:
- * a parallelogram. Two M10 through-bolts along the arm centerline
+ * a parallelogram. Two M12 through-bolts along the arm centerline
  * (with internal crush sleeves in both tubes, as everywhere else).
  */
 
@@ -18,7 +18,7 @@ module drawbar_wedge_plate(
     plate_t = 10,       // Plate thickness = gap between arm and beam
     angle = 157.13,     // Angle of the arm relative to the beam (deg).
                         // Default matches frame.scad: atan2(675, -1600).
-    hole_dia = 11,      // M10, drilled before galvanizing, reamed after
+    hole_dia = 13,      // M12, drilled before galvanizing, reamed after
     hole_spacing = 70,  // Bolt spacing along the arm centerline
     max_len = 120       // Trim the parallelogram's needle tips (millable part)
 ) {

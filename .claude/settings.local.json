@@ -76,7 +76,8 @@
       "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/bottom_view.png -D show_cabin=false -D show_equipment=false -D show_running_gear=false --camera=0,0,0,180,0,0,0)",
       "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/top_narrow.png -D show_cabin=false -D show_equipment=false -D show_running_gear=false --camera=0,0,0,0,0,0,0)",
       "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/ad92b907-c8ce-42cf-8d93-92186915d496/scratchpad/gasbox_check.png -D show_cabin=false -D show_running_gear=false --camera=0,0,0,180,0,0,0)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(scripts/render_scad.sh cad/main_assembly.scad /tmp/claude-0/-workspace/4769c97b-7d56-49bf-a0ef-dd2a99b01482/scratchpad/corner_top.png --camera=100,100,0,0,0,0,900 --projection=o -D show_cabin=false)"
     ]
   }
 }

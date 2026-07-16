@@ -78,27 +78,26 @@ t_rect_max_x = 50;
 t_rect_min_y = -65;
 t_rect_max_y = 65;
 
-// Fastener helpers: one M10 through-bolt (with crush sleeve) in every
-// plate hole. Hole coordinates mirror corner_plate.scad /
-// t_plate.scad (rectangular variants) — keep in sync if the bolt
-// patterns there change.
-corner_plate_holes = [[80, 37], [125, 13], [170, 37], [25, 25],
-                      [37, 80], [13, 125], [37, 170]];
-t_plate_holes = [[37, 45], [13, 15], [37, -15], [13, -45],
-                 [-40, 12], [-100, -12],
-                 [-40, 45], [-40, -45], [-70, 45], [-70, -45],
-                 [-100, 45], [-100, -45]];
+// Fastener helpers: one M12 through-bolt (with crush sleeve) in every
+// plate hole — ONE bolt size for every plate joint in the frame.
+// 2 bolts per arm on the flange centerline (e2 = 1.9*d0; the old M10
+// zig-zag sat at the EN 1993-1-8 floor of 1.18*d0). Hole coordinates
+// mirror corner_plate.scad / t_plate.scad (rectangular variants) —
+// keep in sync if the bolt patterns there change.
+corner_plate_holes = [[80, 25], [170, 25], [25, 25],
+                      [25, 80], [25, 170]];
+t_plate_holes = [[25, 30], [25, -30], [-40, 0], [-100, 0]];
 
 module corner_bolts() {
     for (h = corner_plate_holes)
         translate([h[0], h[1], tube_w + plate_thickness])
-            stack_bolt(10, tube_w + 2 * plate_thickness);
+            stack_bolt(12, tube_w + 2 * plate_thickness);
 }
 
 module t_plate_bolts() {
     for (h = t_plate_holes)
         translate([h[0], h[1], tube_w + plate_thickness])
-            stack_bolt(10, tube_w + 2 * plate_thickness);
+            stack_bolt(12, tube_w + 2 * plate_thickness);
 }
 
 // Helper modules to simplify placement with parameters

@@ -20,7 +20,7 @@
 - [x] CAD model the kitchen drawer with space for the 12V compressor fridge and an electrical-only cable chain (`cad/kitchen_drawer.scad`).
 
 ## Phase 2: Material Sourcing & Purchasing
-- [ ] Order steel (VKR 50x50x3 or 60x40x3), through-bolts (M10/M12 in 8.8/10.9), and precision tube for crush sleeves.
+- [ ] Order steel (VKR 50x50x3), through-bolts (M12 in 8.8/10.9 — one size frame-wide), and 20x3 precision tube for crush sleeves.
 - [ ] Buy 6082-T6 aluminum plates for corners and framework for CNC milling (PrintNC).
 - [ ] Purchase braked torsion axle (overrun brakes, bolt pattern 6x139.7) with damper kit and matching overrun coupling, and Falken Wildpeak A/T3W 265/60R18 (with original rims).
 - [ ] Order road equipment: E-marked lighting kit, reflectors, fenders, type-approved coupling, jockey wheel, breakaway cable.
@@ -32,7 +32,7 @@
 - [ ] Consumables: Corrugated conduits, marine grease/Duralac, insulation, cable glands.
 
 ## Phase 3: Chassis Build & Mechanics
-- [ ] Cut and drill the steel frame (VKR) — 11 mm holes for M10, 13 mm for M12.
+- [ ] Cut and drill the steel frame (VKR) — 13 mm holes for M12 (all plate bolts on the tube centerline).
 - [ ] Cut and fit internal crush sleeves for all through-bolts.
 - [ ] CNC mill the aluminum corner plates and drawbar wedge/spacer plates.
 - [ ] Dry fit the entire frame with bolted joints for fitment check.

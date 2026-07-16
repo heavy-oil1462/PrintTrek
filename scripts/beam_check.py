@@ -385,6 +385,42 @@ def check_angle_joint(leg=80.0, t=8.0, length=120.0):
     ])
 
 
+def check_plate_bolts():
+    # Corner/T-plate sandwiches: 2x M12 8.8 per plate arm on the tube
+    # CENTERLINE (replaced the 3x M10 zig-zag at +/-12 mm — that pattern
+    # sat at the EN 1993-1-8 edge-distance floor, e2 = 1.18*d0; centered
+    # M12 gives e2 = 25 mm = 1.9*d0). Friction grip via crush sleeves,
+    # two faying planes per bolt (top+bottom plate sandwich).
+    A_s = 84.3                                     # mm2, M12 stress area
+    F_p = 0.7 * FUB_8_8 * A_s                      # EC3 full preload, N
+    mu, n_ifc, n_bolt = 0.2, 2, 2
+    slip_arm = n_bolt * n_ifc * mu * F_p           # per plate arm
+    demand = 5.0e3   # bounding transverse force at any plate joint:
+    #                  corner-plate FEA case uses 2.5 kN, racking
+    #                  load-path indicators stay below ~5 kN
+    e2, d0 = 25.0, 13.0
+
+    # Net section where plate holes meet real rail stress: the T-plate
+    # row at the mid crossbeam (x ~945/1005 mm, rail ~90 MPa gross in
+    # the 3g deck case). One 13 mm hole through both flanges per plane.
+    b = h = 50.0; t = 3.0
+    I_g = (b * h**3 - (b - 2*t) * (h - 2*t)**3) / 12
+    I_n = I_g - 2 * (13.0 * t) * ((h - t) / 2)**2
+    w_ratio = I_n / I_g
+    s_net = 90.0 / w_ratio
+
+    report("PLATE JOINTS — 2x M12 8.8 per arm, centerline (was 3x M10 zig-zag)", [
+        f"Slip capacity per arm (2 bolts x 2 planes): {slip_arm/1e3:.1f} kN "
+        f"vs ~{demand/1e3:.0f} kN demand   SF = {slip_arm/demand:.1f}",
+        f"Edge distance e2 = {e2:.0f} mm = {e2/d0:.1f}*d0 (EN min 1.2*d0; "
+        f"old zig-zag was 1.18*d0)",
+        f"Rail net section at the T-plate row: W_net/W = {w_ratio:.2f} -> "
+        f"{s_net:.0f} MPa net vs S355   SF = {355/s_net:.1f}",
+        "Preloaded + filled holes; 2 bolts/arm needs positive locking",
+        "(Nord-Lock or lock nuts) — redundancy is halved vs the zig-zag.",
+    ])
+
+
 def check_bolts():
     # Drawbar-to-crossbeam M12 8.8 through-bolts with crush sleeves.
     # Governing action: lap couple from LC2 + direct shear, single shear plane
@@ -431,6 +467,7 @@ def main():
     # THE drawbar (DEFAULT design): V of two 50x50x3 arms + its joints
     check_v_drawbar(PROFILES["VKR 50x50x3"])
     check_v_joints()
+    check_plate_bolts()
     # Legacy comparison: the single central bar it replaced, and why one
     # thin bar alone never worked:
     check_drawbar(PROFILES["VKR 100x50x4"])

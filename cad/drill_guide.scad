@@ -1,17 +1,18 @@
 /*
  * Offroad Adventure Trailer - 3D Printed Drill Guide
  *
- * Clamp-on saddle for the VKR 50x50 profiles that positions the zig-zag
+ * Clamp-on saddle for the VKR 50x50 profiles that positions the plate
  * bolt pattern without a CNC or marking-out. Print in PETG/PLA (100%
  * perimeters around the bushings). Slide onto the tube until the end
- * stop touches the tube end, clamp with a G-clamp, and drill 11 mm
+ * stop touches the tube end, clamp with a G-clamp, and drill 13 mm
  * through the bushings (holes are reamed after galvanizing anyway).
  *
- * Hole pattern matches corner_plate.scad bolt_holes_x():
- * 30 / 75 / 120 mm from the tube end, alternating +/-12 mm off center.
- * For the opposite tube wall, drill straight through with a long bit or
- * flip the guide to the other side of the corner (the pattern is
- * symmetric under 180-degree rotation about the tube axis).
+ * Hole pattern matches the corner-plate arms (corner_plate.scad):
+ * 2x M12 on the tube CENTERLINE. Referenced from a crossbeam end the
+ * holes sit 30 / 120 mm from the stop; for the RAIL ends (holes 80 /
+ * 170 mm from the rail end) insert a 50 mm spacer block between the
+ * end stop and the tube. Centered holes = drill straight through both
+ * walls with a long bit; no flipping or mirroring needed.
  *
  * Origin: tube end at X=0, tube occupies Y 0..50 with its top face at Z=0.
  */
@@ -24,11 +25,11 @@ side_drop = 35;     // how far the sides reach down the tube
 stop_t = 8;         // end stop thickness
 bush_h = 12;        // drill bushing height above the top plate
 bush_wall = 5;
-hole_dia = 11;      // M10 (reamed after galvanizing)
+hole_dia = 13;      // M12 (reamed after galvanizing)
 guide_len = 170;
 
 // [distance from tube end, offset from tube centerline]
-hole_pattern = [[30, 12], [75, -12], [120, 12]];
+hole_pattern = [[30, 0], [120, 0]];
 
 module drill_guide() {
     difference() {
