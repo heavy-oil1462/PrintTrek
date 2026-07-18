@@ -6,3 +6,19 @@ fea/*.12d
 fea/spooles.out
 __pycache__/
 *.pyc
+
+# control-system secrets / local state
+esphome/secrets.yaml
+esphome/.esphome/
+.esphome/
+.esphome-sim/
+# private node-config repo, cloned inside this checkout (see docs/EXTENDING.md)
+printtrek-config/
+server/.env
+server/mosquitto/passwd
+
+# build / dev artifacts
+.venv/
+result
+result-*
+.direnv/

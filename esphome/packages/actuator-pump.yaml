@@ -1,0 +1,79 @@
+# =============================================================================
+# PrintTrek — packages/actuator-pump.yaml
+# -----------------------------------------------------------------------------
+# 12 V galley pump (Seaflo/Shurflo, pressure-controlled) on a relay or
+# logic-level MOSFET (low side). The relay is the MASTER cut — the pump's own
+# pressure switch still cycles it while enabled. This load draws power while
+# ON, so it carries a hard max-runtime watchdog that runs locally on the
+# device: if anything — HA, an automation, a human — leaves the pump relay
+# on, it is forced off after ${pump_max_runtime_s}.
+#
+# Refuses to start at load-shed tier >= 2 (the fridge outranks water
+# pressure), and is force-stopped within 30 s if tier 2 is entered while
+# running. Dry-run protection (low water level) lives in
+# automation-water.yaml — include both.
+#
+# The MQTT command for this switch is intentionally NOT retained: a retained
+# ON replayed at the next radio window could pressurize the system hours
+# after you clicked. Sleeping-safe control belongs to setpoints
+# (automation-water.yaml's "Pump Enabled").
+#
+# Substitutions:
+#   pump_id             Switch id (default: water_pump).
+#                       Referenced by automation-water.yaml.
+#   pump_name           Friendly name (default: Water Pump)
+#   pump_pin            MOSFET/relay gate pin (default: GPIO27)
+#   pump_max_runtime_s  Hard runtime cap per activation (default: 600)
+#
+# Provides:
+#   switch id ${pump_id}
+# =============================================================================
+
+substitutions:
+  pump_id: water_pump
+  pump_name: Water Pump
+  pump_pin: GPIO27
+  pump_max_runtime_s: "600"
+
+switch:
+  - platform: gpio
+    pin: ${pump_pin}
+    id: ${pump_id}
+    name: ${pump_name}
+    icon: mdi:water-pump
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - if:
+          condition:
+            lambda: 'return id(load_shed_tier) >= 2;'
+          then:
+            - logger.log:
+                level: WARN
+                format: "load-shed tier >= 2: refusing to start pump"
+            - switch.turn_off: ${pump_id}
+          else:
+            - script.execute: ${pump_id}_watchdog
+    on_turn_off:
+      - script.stop: ${pump_id}_watchdog
+
+script:
+  - id: ${pump_id}_watchdog
+    mode: restart
+    then:
+      - delay: ${pump_max_runtime_s}s
+      - logger.log:
+          level: WARN
+          format: "pump watchdog: max runtime reached, forcing off"
+      - switch.turn_off: ${pump_id}
+
+interval:
+  - interval: 30s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(load_shed_tier) >= 2 && id(${pump_id}).state;'
+          then:
+            - logger.log:
+                level: WARN
+                format: "load-shed tier >= 2: force-stopping pump"
+            - switch.turn_off: ${pump_id}

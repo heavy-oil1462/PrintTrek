@@ -1,0 +1,92 @@
+# PrintTrek — example Lovelace dashboard.
+# Add via Settings -> Dashboards -> Add dashboard -> "New dashboard from YAML"
+# or paste views into an existing dashboard's raw editor.
+# Entity ids assume node_name "printtrek-trailer" — adjust if renamed.
+title: Trailer
+views:
+  - title: Overview
+    icon: mdi:truck-trailer
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: gauge
+            name: Water
+            entity: sensor.printtrek_trailer_water_level
+            min: 0
+            max: 100
+            severity:
+              red: 0
+              yellow: 20
+              green: 40
+          - type: entities
+            title: Water
+            entities:
+              - sensor.printtrek_trailer_water_volume
+              - switch.printtrek_trailer_water_pump
+              - switch.printtrek_trailer_pump_enabled
+              - number.printtrek_trailer_pump_low_water_cutoff
+              - sensor.printtrek_trailer_pump_used_today
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Power
+            entities:
+              - sensor.printtrek_trailer_battery_voltage
+              - sensor.printtrek_battery_soc_estimate
+              - sensor.printtrek_trailer_battery_current
+              - sensor.printtrek_trailer_battery_power
+              - sensor.printtrek_trailer_load_shed_tier
+              - sensor.printtrek_trailer_load_shed_state
+          - type: entities
+            title: Link
+            entities:
+              - binary_sensor.printtrek_radio_window
+              - binary_sensor.printtrek_telemetry_stale
+              - switch.printtrek_trailer_radio_always_on
+              - sensor.printtrek_trailer_wifi_rssi
+              - sensor.printtrek_trailer_uptime
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Fridge
+            entities:
+              - switch.printtrek_trailer_fridge_enabled
+              - binary_sensor.printtrek_trailer_fridge_power
+              - sensor.printtrek_trailer_fridge_temperature
+              - binary_sensor.printtrek_fridge_warm
+          - type: entities
+            title: Interior
+            entities:
+              - sensor.printtrek_trailer_interior_temperature
+              - sensor.printtrek_trailer_interior_humidity
+              - sensor.printtrek_dew_point
+              - switch.printtrek_trailer_exterior_lights
+
+  - title: History
+    icon: mdi:chart-line
+    cards:
+      - type: history-graph
+        title: Power (7 d)
+        hours_to_show: 168
+        entities:
+          - sensor.printtrek_trailer_battery_voltage
+          - sensor.printtrek_trailer_load_shed_tier
+      - type: history-graph
+        title: Battery current (48 h)
+        hours_to_show: 48
+        entities:
+          - sensor.printtrek_trailer_battery_current
+      - type: history-graph
+        title: Water (48 h)
+        hours_to_show: 48
+        entities:
+          - sensor.printtrek_trailer_water_level
+          - switch.printtrek_trailer_water_pump
+      - type: history-graph
+        title: Fridge (48 h)
+        hours_to_show: 48
+        entities:
+          - sensor.printtrek_trailer_fridge_temperature
+          - binary_sensor.printtrek_trailer_fridge_power

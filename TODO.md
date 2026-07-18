@@ -48,6 +48,8 @@
 - [ ] Install IP65 electrical cabinet and establish star ground (equipotential bonding 6 mm²).
 - [ ] Build the standalone battery module (Power Station) with DC-DC/MPPT and Anderson connections.
 - [ ] Mount Teltonika router, Poynting antenna, and CNC mill the recessed connection panel.
+- [ ] Bench-test the ESP32 controller (esphome/example-trailer.yaml) with the relays, INA226 shunt, and tank sender before installation; calibrate the sender per docs/HARDWARE.md.
+- [ ] Set up the trailer Raspberry Pi server as a nix config (Home Assistant, Grafana, Loki, Prometheus) — the repo's server/ compose stack is dev-only.
 - [ ] Route propane pipes on the right side and mount CNC-milled niches with external quick connects.
 - [ ] Leak test the propane system.
 

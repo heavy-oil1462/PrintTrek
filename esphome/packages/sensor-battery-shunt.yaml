@@ -1,0 +1,60 @@
+# =============================================================================
+# PrintTrek — packages/sensor-battery-shunt.yaml
+# -----------------------------------------------------------------------------
+# Battery monitoring via an INA226 (I2C) on an external shunt in the battery
+# main negative. Reads pack voltage directly (the INA226 bus input handles
+# 12 V without a divider) and NET current through the shunt: positive =
+# charging (solar / DC-DC / Noco), negative = discharging (fridge, pump,
+# lights, router).
+#
+# battery_voltage is the input to automation-load-shedding.yaml — every
+# PrintTrek node that sheds loads needs this package (or a custom package
+# providing a sensor with the same id; see docs/EXTENDING.md). A plain ADC
+# divider package works too if you have no shunt — only the
+# ${battery_sensor_id} id is a contract, the current/power sensors are not.
+#
+# Shunt sizing: the default 0.0015 ohm matches a common 50 A / 75 mV shunt —
+# plenty for the 30 A DC-DC plus the 12 V loads. Set ina226_shunt_resistance
+# to YOUR shunt's plate value; it dominates current accuracy.
+#
+# Requires: packages/bus-i2c.yaml.
+#
+# Substitutions:
+#   ina226_address           I2C address (default: 0x40)
+#   ina226_shunt_resistance  Shunt value (default: 0.0015 ohm = 50A/75mV)
+#   ina226_max_current       Expected max current magnitude (default: 50A)
+#   battery_update_interval  Sample rate (default: 15s — load shedding input)
+#   battery_sensor_id        Voltage sensor id (default: battery_voltage)
+#
+# Provides:
+#   sensor ids ${battery_sensor_id} (V), battery_current (A, signed),
+#   battery_power (W, signed)
+# =============================================================================
+
+substitutions:
+  ina226_address: "0x40"
+  ina226_shunt_resistance: 0.0015 ohm
+  ina226_max_current: 50A
+  battery_update_interval: 15s
+  battery_sensor_id: battery_voltage
+
+sensor:
+  - platform: ina226
+    i2c_id: bus_a
+    address: ${ina226_address}
+    shunt_resistance: ${ina226_shunt_resistance}
+    max_current: ${ina226_max_current}
+    adc_averaging: 16
+    update_interval: ${battery_update_interval}
+    bus_voltage:
+      name: Battery Voltage
+      id: ${battery_sensor_id}
+      accuracy_decimals: 2
+    current:
+      name: Battery Current
+      id: battery_current
+      accuracy_decimals: 2
+    power:
+      name: Battery Power
+      id: battery_power
+      accuracy_decimals: 1

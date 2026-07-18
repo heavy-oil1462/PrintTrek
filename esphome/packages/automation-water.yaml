@@ -1,0 +1,130 @@
+# =============================================================================
+# PrintTrek — packages/automation-water.yaml
+# -----------------------------------------------------------------------------
+# Local water-system supervision. Runs entirely on the ESP32; WiFi/MQTT/HA
+# can all be down and the pump is still protected. Every tick it force-stops
+# the pump relay when ANY of these hold:
+#
+#   * "Pump Enabled" switch is off (the sleeping-safe master setpoint —
+#     unlike the raw pump switch its MQTT command is retained)
+#   * water level below "Pump Low Water Cutoff" — dry-run protection; a
+#     diaphragm pump run dry loses prime and eats its own valves
+#   * water level is NaN (sensor fault) — FAIL SAFE: no pumping. No level
+#     sender? Include packages/water-no-sensor.yaml, which provides the
+#     level contract as a constant, and protection degrades to the pump
+#     package's runtime watchdog only.
+#
+# It also accumulates the pump's daily runtime (whoever switched it on,
+# including manual HA control), persisted across reboots and reset at local
+# midnight — a leak/left-open tell-tale for the HA dashboard. Without a
+# valid wall clock the counter simply keeps accumulating; the pump gates do
+# not depend on time.
+#
+# All runtime setpoints are ESPHome number/switch entities: editable from HA
+# via retained MQTT commands (applied at the next radio window), persisted in
+# flash, and enforced locally.
+#
+# Requires:
+#   * a water level sensor id ${water_sensor} (%, 0-100) —
+#     default matches sensor-water-level.yaml
+#   * a switch id ${water_pump_switch} — default matches actuator-pump.yaml
+#
+# Substitutions:
+#   water_sensor                  (default: water_level)
+#   water_pump_switch             (default: water_pump)
+#   water_default_cutoff_pct      Initial low-water cutoff (default: 5)
+#   water_check_interval_s        Control-loop tick (default: 10)
+# =============================================================================
+
+substitutions:
+  water_sensor: water_level
+  water_pump_switch: water_pump
+  water_default_cutoff_pct: "5"
+  water_check_interval_s: "10"
+
+globals:
+  - id: pump_run_s_today
+    type: float
+    restore_value: true
+    initial_value: "0"
+  - id: pump_last_day
+    type: int
+    restore_value: true
+    initial_value: "-1"
+
+switch:
+  - platform: template
+    id: pump_enabled
+    name: Pump Enabled
+    icon: mdi:water-pump
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    command_retain: true
+
+number:
+  - platform: template
+    id: pump_low_water_cutoff
+    name: Pump Low Water Cutoff
+    unit_of_measurement: "%"
+    icon: mdi:water-percent-alert
+    min_value: 0
+    max_value: 50
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: ${water_default_cutoff_pct}
+    entity_category: config
+    command_retain: true
+
+sensor:
+  - platform: template
+    id: pump_used_today
+    name: Pump Used Today
+    unit_of_measurement: s
+    icon: mdi:cup-water
+    accuracy_decimals: 0
+    update_interval: 60s
+    entity_category: diagnostic
+    lambda: 'return id(pump_run_s_today);'
+
+interval:
+  - interval: ${water_check_interval_s}s
+    then:
+      - lambda: |-
+          const bool pump_on = id(${water_pump_switch}).state;
+
+          // Runtime accounting: count every second the pump is on,
+          // regardless of who turned it on.
+          if (pump_on)
+            id(pump_run_s_today) += ${water_check_interval_s};
+
+          // Daily counter reset at local midnight (when the clock is valid).
+          const auto now = id(net_time).now();
+          if (now.is_valid() && now.day_of_year != id(pump_last_day)) {
+            id(pump_last_day) = now.day_of_year;
+            id(pump_run_s_today) = 0;
+          }
+
+          // Hard gates — each one force-stops the pump.
+          if (!id(pump_enabled).state) {
+            if (pump_on) {
+              ESP_LOGW("water", "pump disabled: forcing pump off");
+              id(${water_pump_switch}).turn_off();
+            }
+            return;
+          }
+          const float level = id(${water_sensor}).state;
+          if (std::isnan(level)) {
+            // Sensor fault: fail safe, no pumping.
+            if (pump_on) {
+              ESP_LOGW("water", "water level unavailable: forcing pump off");
+              id(${water_pump_switch}).turn_off();
+            }
+            return;
+          }
+          if (level < id(pump_low_water_cutoff).state && pump_on) {
+            ESP_LOGW("water", "water %.0f %% below cutoff: forcing pump off",
+                     level);
+            id(${water_pump_switch}).turn_off();
+          }

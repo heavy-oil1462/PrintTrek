@@ -1,0 +1,14 @@
+# PrintTrek dev-stack Home Assistant configuration (mounted read-only by
+# server/docker-compose.yml). The trailer package and blueprints come from
+# the repo's homeassistant/ directory via bind mounts — edit them there.
+#
+# The MQTT integration itself is a config entry (UI-only): add it once via
+# Settings -> Devices and Services -> Add integration -> MQTT, host
+# "mosquitto", credentials from server/.env.
+
+default_config:
+
+homeassistant:
+  name: PrintTrek Dev
+  unit_system: metric
+  packages: !include_dir_named packages

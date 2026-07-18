@@ -1,0 +1,38 @@
+# =============================================================================
+# PrintTrek — packages/sensor-fridge-ds18b20.yaml
+# -----------------------------------------------------------------------------
+# DS18B20 (1-wire) temperature probe inside the fridge compartment. The
+# compressor fridge regulates itself; this is the independent check that the
+# food is actually cold — the HA package alerts when it stays warm.
+#
+# With a single DS18B20 on the bus no address is needed. Running several
+# (fridge + outside air, say), copy this package and set an explicit
+# `address:` per sensor — find addresses in the boot log.
+#
+# Substitutions:
+#   fridge_onewire_pin       1-wire data pin, 4.7k pull-up to 3.3 V
+#                            (default: GPIO4)
+#   fridge_update_interval   Sample rate (default: 30s)
+#   fridge_temp_id           Sensor id (default: fridge_temperature)
+#
+# Provides:
+#   sensor id ${fridge_temp_id} (degC)
+# =============================================================================
+
+substitutions:
+  fridge_onewire_pin: GPIO4
+  fridge_update_interval: 30s
+  fridge_temp_id: fridge_temperature
+
+one_wire:
+  - platform: gpio
+    id: fridge_onewire_bus
+    pin: ${fridge_onewire_pin}
+
+sensor:
+  - platform: dallas_temp
+    one_wire_id: fridge_onewire_bus
+    name: Fridge Temperature
+    id: ${fridge_temp_id}
+    update_interval: ${fridge_update_interval}
+    accuracy_decimals: 1

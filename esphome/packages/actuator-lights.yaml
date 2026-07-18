@@ -1,0 +1,69 @@
+# =============================================================================
+# PrintTrek — packages/actuator-lights.yaml
+# -----------------------------------------------------------------------------
+# Exterior lights (side and rear LED floods) on a relay or logic-level
+# MOSFET. Comfort load: first to go in load shedding (forced off at
+# tier >= 1) and guarded by an auto-off watchdog so a forgotten switch never
+# drains the bank overnight.
+#
+# The MQTT command for this switch is intentionally NOT retained (replay
+# hazard — see actuator-pump.yaml).
+#
+# Substitutions:
+#   lights_id         Switch id (default: exterior_lights)
+#   lights_name       Friendly name (default: Exterior Lights)
+#   lights_pin        MOSFET/relay gate pin (default: GPIO26)
+#   lights_max_on_s   Auto-off after this many seconds (default: 7200 = 2 h)
+#
+# Provides:
+#   switch id ${lights_id}
+# =============================================================================
+
+substitutions:
+  lights_id: exterior_lights
+  lights_name: Exterior Lights
+  lights_pin: GPIO26
+  lights_max_on_s: "7200"
+
+switch:
+  - platform: gpio
+    pin: ${lights_pin}
+    id: ${lights_id}
+    name: ${lights_name}
+    icon: mdi:lightbulb-group-outline
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - if:
+          condition:
+            lambda: 'return id(load_shed_tier) >= 1;'
+          then:
+            - logger.log:
+                level: WARN
+                format: "load-shed tier >= 1: refusing to start lights"
+            - switch.turn_off: ${lights_id}
+          else:
+            - script.execute: ${lights_id}_watchdog
+    on_turn_off:
+      - script.stop: ${lights_id}_watchdog
+
+script:
+  - id: ${lights_id}_watchdog
+    mode: restart
+    then:
+      - delay: ${lights_max_on_s}s
+      - logger.log:
+          level: WARN
+          format: "lights watchdog: auto-off after max on-time"
+      - switch.turn_off: ${lights_id}
+
+interval:
+  - interval: 30s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(load_shed_tier) >= 1 && id(${lights_id}).state;'
+          then:
+            - logger.log:
+                level: WARN
+                format: "load-shed tier >= 1: force-stopping lights"
+            - switch.turn_off: ${lights_id}

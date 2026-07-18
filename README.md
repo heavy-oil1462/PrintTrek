@@ -39,7 +39,7 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
   - Recessed, milled niches for external water, gas, and power outlets.
   - Modular "Power Station" 12V box, 230V mains integration, and Teltonika 5G network integration.
 - **Slide-Out Kitchen:** Accommodates a heavy-duty drawer (100-150kg slides) for a 12V compressor fridge (e.g., Dometic CFX), fed via an electrical-only energy chain. Propane stays on fixed pipes to external quick-connects for outdoor cooking.
-- **CAN-Bus Control System:** Arduino-based CAN nodes (relays + sensors), a Go backend on a Raspberry Pi, and a web dashboard for monitoring water level, battery voltage, and temperature, and for switching the pump, lights, and fridge remotely.
+- **ESPHome + Home Assistant Control:** An ESP32 running ESPHome (relays + sensors, MQTT) with Home Assistant as the UI — monitoring water level, battery voltage/current, and temperatures, and switching the pump, lights, and fridge directly. Battery protection (tiered load shedding), pump dry-run cutoff, and runtime watchdogs run locally on the ESP32, so the network can be down without risk. Includes a full software twin: the real firmware runs under QEMU in a container against your own broker (`docs/SIMULATION.md`).
 
 ## Design Snapshots (ideation-stage layout)
 
@@ -50,11 +50,34 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
 
 The body/galley layout is still being iterated and does not drive the structure. Renders are generated headlessly with `scripts/render_scad.sh cad/<model>.scad <output>.png` (chassis-only: add `-D show_cabin=false -D show_equipment=false`).
 
+## Control System (ESPHome + Home Assistant)
+
+The trailer is controlled by an ESP32 running [ESPHome](https://esphome.io) with Home Assistant as the UI. Everything below runs inside the dev shell (`nix develop`):
+
+```bash
+python3 tools/stack.py init && python3 tools/stack.py up   # dev stack: mosquitto + HA
+python3 tools/mock_device.py --discovery                   # software twin, no hardware
+esphome run esphome/example-trailer.yaml                   # real hardware (copy + edit first)
+```
+
+Or run the REAL firmware without hardware — an esp32 build under Espressif QEMU in a container, against your own broker and HA, with a web panel to inject sensor values (`docs/SIMULATION.md`):
+
+```bash
+python3 tools/sim_container.py build
+python3 tools/sim_container.py run --broker <mqtt-host> --username u --password p
+```
+
+The node is live on the network by default (direct switch control from HA); a duty-cycled storage mode with retained setpoints is one switch away. Safety logic — tiered battery load shedding, pump dry-run cutoff, runtime watchdogs — runs locally on the ESP32 regardless of connectivity. The MQTT contract is in [`docs/PROTOCOL.md`](docs/PROTOCOL.md); adopt/extend via composable packages per [`docs/EXTENDING.md`](docs/EXTENDING.md); controller wiring in [`docs/HARDWARE.md`](docs/HARDWARE.md).
+
 ## Repository Structure
 
 - `/cad`: Contains all the 3D models and manufacturing files (e.g., OpenSCAD, STEP, or STL files) for the corner plates, niches, and chassis geometry.
 - `/concepts`: Markdown files and diagrams detailing sub-systems (like electrical routing, propane layout, and water flow).
-- `/software`: The trailer control system — Arduino CAN-node firmware, Go backend (WebSocket API + CAN bridge), and web dashboard.
+- `/esphome`: The trailer control firmware — a composable ESPHome base + packages (sensors, actuators, load shedding); see `docs/EXTENDING.md`.
+- `/homeassistant`: Home Assistant package (derived sensors, alerts), alert blueprint, and an example dashboard.
+- `/server`: Dev/test stack (mosquitto + Home Assistant via docker compose). The production stack will run nix-managed on the trailer's Raspberry Pi.
+- `/sim` and `/tools`: The firmware simulator (real esp32 build under QEMU + web control panel), mock device, protocol test, and the validation gate (`tools/validate.py`).
+- `/docs`: Control-system contracts — `PROTOCOL.md`, `EXTENDING.md`, `HARDWARE.md`, `SIMULATION.md`.
 - `/scripts`: Helper tools — `calculate_tubes.py` (steel cut list from the CAD files) and `calculate_mass.py` (weight, center of gravity, and tongue-load budget).
 - `MATERIALS.md`: A comprehensive Bill of Materials (BOM) detailing the steel, aluminum, fasteners, and specific off-the-shelf components required.
 - `SPECS.md`: The core technical specifications and overarching design decisions.
