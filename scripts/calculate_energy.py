@@ -7,8 +7,8 @@ for different SETUPS (battery size x solar x fridge type) across different
 solar conditions. Companion to calculate_mass.py.
 
 All loads are estimates — refine with measured values once installed
-(the CAN node already reports battery voltage; add a shunt/coulomb
-counter to log real consumption).
+(the ESPHome node reports battery voltage AND net current via the INA226
+shunt — Home Assistant history gives real consumption for free).
 """
 
 SYSTEM_V = 12.8              # LiFePO4 nominal
@@ -24,7 +24,7 @@ BASE_LOADS = [
     ("Teltonika 5G router + antenna",       8.0, 24),
     ("LED lighting (interior + exterior)", 10.0,  3),
     ("Water pump (Seaflo/Shurflo)",        60.0,  0.2),
-    ("CAN nodes + backend (RPi + Arduino)", 4.0, 24),
+    ("ESP32 controller + RPi server",       4.0, 24),
     ("Phone/laptop/device charging",       30.0,  2),
 ]
 

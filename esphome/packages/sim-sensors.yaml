@@ -1,0 +1,104 @@
+# =============================================================================
+# PrintTrek — packages/sim-sensors.yaml
+# -----------------------------------------------------------------------------
+# Injectable replacements for every stock hardware sensor. Each sensor
+# carries the exact id + name of its hardware counterpart, so the real
+# automation packages (water / load shedding / fridge control) run unmodified
+# against values you set from the simulator web UI (sim/webui.py) — or from
+# anything that publishes to the injection topics:
+#
+#   <mqtt_root>/<node_name>/sim/battery          V    (Battery Voltage)
+#   <mqtt_root>/<node_name>/sim/battery_current  A    (Battery Current,
+#                                                      + charge, - discharge)
+#   <mqtt_root>/<node_name>/sim/water            %    (Water Level)
+#   <mqtt_root>/<node_name>/sim/temperature      degC (Interior Temperature)
+#   <mqtt_root>/<node_name>/sim/humidity         %    (Interior Humidity)
+#   <mqtt_root>/<node_name>/sim/fridge_temp      degC (Fridge Temperature)
+#
+# Publish retained so values survive the emulated radio duty cycle exactly
+# like setpoints do. The `sim/` subtree is an input, not telemetry — it
+# exists only when this package is included; real nodes have no sim/ topics.
+#
+# Fail-safe semantics are preserved: before the first injection a sensor has
+# no state (NaN), which the automations already treat as "sensor broken"
+# (the pump refuses to run, load shedding holds its tier).
+# =============================================================================
+
+substitutions:
+  tank_volume_l: "40"
+
+sensor:
+  - platform: mqtt_subscribe
+    topic: ${mqtt_root}/${node_name}/sim/battery
+    name: Battery Voltage
+    id: battery_voltage
+    unit_of_measurement: V
+    device_class: voltage
+    accuracy_decimals: 2
+
+  - platform: mqtt_subscribe
+    topic: ${mqtt_root}/${node_name}/sim/battery_current
+    name: Battery Current
+    id: battery_current
+    unit_of_measurement: A
+    device_class: current
+    accuracy_decimals: 2
+
+  - platform: mqtt_subscribe
+    topic: ${mqtt_root}/${node_name}/sim/water
+    name: Water Level
+    id: water_level
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+    accuracy_decimals: 0
+
+  - platform: mqtt_subscribe
+    topic: ${mqtt_root}/${node_name}/sim/temperature
+    name: Interior Temperature
+    id: interior_temperature
+    unit_of_measurement: °C
+    device_class: temperature
+    accuracy_decimals: 1
+
+  - platform: mqtt_subscribe
+    topic: ${mqtt_root}/${node_name}/sim/humidity
+    name: Interior Humidity
+    id: interior_humidity
+    unit_of_measurement: "%"
+    device_class: humidity
+    accuracy_decimals: 0
+
+  - platform: mqtt_subscribe
+    topic: ${mqtt_root}/${node_name}/sim/fridge_temp
+    name: Fridge Temperature
+    id: fridge_temperature
+    unit_of_measurement: °C
+    device_class: temperature
+    accuracy_decimals: 1
+
+  # Derived exactly like the INA226 would report it — not injectable.
+  - platform: template
+    name: Battery Power
+    id: battery_power
+    unit_of_measurement: W
+    device_class: power
+    accuracy_decimals: 1
+    update_interval: 15s
+    lambda: |-
+      if (std::isnan(id(battery_voltage).state) ||
+          std::isnan(id(battery_current).state))
+        return NAN;
+      return id(battery_voltage).state * id(battery_current).state;
+
+  # Derived liters, same as sensor-water-level.yaml — not injectable.
+  - platform: template
+    name: Water Volume
+    id: water_volume
+    unit_of_measurement: L
+    icon: mdi:water
+    accuracy_decimals: 1
+    update_interval: 60s
+    lambda: |-
+      if (std::isnan(id(water_level).state))
+        return NAN;
+      return id(water_level).state * ${tank_volume_l} / 100.0;

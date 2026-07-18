@@ -1,0 +1,53 @@
+# =============================================================================
+# PrintTrek — example-trailer.yaml
+# -----------------------------------------------------------------------------
+# Reference node: composes the base with every stock package. Copy this file,
+# keep the packages you have hardware for, delete the rest, and override
+# substitutions to match your wiring. Core logic is never edited — packages +
+# substitutions are the extension mechanism (docs/EXTENDING.md).
+#
+# Build:   esphome compile esphome/example-trailer.yaml
+# Flash:   esphome run esphome/example-trailer.yaml
+# =============================================================================
+
+substitutions:
+  node_name: printtrek-trailer
+  friendly_name: PrintTrek Trailer
+  timezone: Europe/Stockholm
+
+  # The node is live by default (radio_always_on_default in the base) for
+  # direct HA control. When "Radio Always On" is switched off (storage /
+  # deep off-grid), this is the duty cycle: 10 min cadence, ~45 s awake
+  # per window worst case.
+  telemetry_interval_min: "10"
+
+  # Battery shunt: set to YOUR shunt's plate value (default 50 A / 75 mV).
+  ina226_shunt_resistance: 0.0015 ohm
+
+  # Water sender calibration (see docs/HARDWARE.md for the procedure).
+  water_raw_empty_v: "0.35"
+  water_raw_full_v: "2.40"
+  tank_volume_l: "40"
+
+  # Pump: pressure-controlled, so the relay normally idles ON only briefly;
+  # 10 min hard cap catches a stuck pressure switch or an open tap.
+  pump_max_runtime_s: "600"
+
+  # LiFePO4 load-shed tiers (BMS cutoff sits below tier 3).
+  loadshed_tier1_v: "12.8"
+  loadshed_tier2_v: "12.4"
+  loadshed_tier3_v: "12.0"
+
+packages:
+  base: !include trailer-base.yaml
+  radio: !include packages/radio-wifi.yaml
+  i2c: !include packages/bus-i2c.yaml
+  battery: !include packages/sensor-battery-shunt.yaml
+  water: !include packages/sensor-water-level.yaml
+  climate: !include packages/sensor-sht3x.yaml
+  fridge_temp: !include packages/sensor-fridge-ds18b20.yaml
+  pump: !include packages/actuator-pump.yaml
+  lights: !include packages/actuator-lights.yaml
+  fridge: !include packages/actuator-fridge.yaml
+  water_guard: !include packages/automation-water.yaml
+  load_shedding: !include packages/automation-load-shedding.yaml

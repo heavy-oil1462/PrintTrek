@@ -1,0 +1,35 @@
+# =============================================================================
+# PrintTrek — packages/water-no-sensor.yaml
+# -----------------------------------------------------------------------------
+# No tank level sender? Include this INSTEAD of sensor-water-level.yaml and
+# automation-water.yaml still works: the enable switch and daily runtime
+# counter remain — only the dry-run cutoff is gone.
+#
+# It works by providing the ${water_sensor_id} contract as a constant 100 %
+# ("always full"), so the low-water gate never trips. The sensor is
+# internal: it never reaches MQTT/HA, so nothing pretends to be a real
+# sender.
+#
+# Note the deliberate trade-off: the NaN fail-safe ("broken sender -> no
+# pumping") cannot trigger, because there is no sender to break. The pump
+# package's runtime watchdog is then the only dry-run protection — keep
+# ${pump_max_runtime_s} tight.
+#
+# Substitutions:
+#   water_sensor_id   (default: water_level — the automation-water input)
+#
+# Provides:
+#   sensor id ${water_sensor_id} (constant 100 %, internal)
+# =============================================================================
+
+substitutions:
+  water_sensor_id: water_level
+
+sensor:
+  - platform: template
+    id: ${water_sensor_id}
+    internal: true
+    update_interval: 60s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: "return 100.0;"

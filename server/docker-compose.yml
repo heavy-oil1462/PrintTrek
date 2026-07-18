@@ -1,0 +1,68 @@
+# PrintTrek DEV server stack: mosquitto (MQTT) + Home Assistant.
+#
+# This is the self-contained dev/test stack — point the trailer node (or the
+# simulator / mock device) at it and everything shows up in HA via MQTT
+# discovery. It is NOT the production deployment: the trailer's on-board
+# server (Raspberry Pi) will run a nix-managed stack (Home Assistant,
+# Grafana, Loki, Prometheus) maintained separately. Any production HA works
+# identically with this repo: it only needs the MQTT integration pointed at
+# a broker both sides can reach, plus the files in ../homeassistant/ (see
+# the package header there).
+#
+# Setup:  python3 ../tools/stack.py init   (generates .env + mosquitto passwd)
+# Run:    python3 ../tools/stack.py up     (or: docker compose up -d)
+# Check:  python3 ../tools/stack.py smoke
+#
+# One-time UI step after first start: HA's MQTT integration cannot be
+# YAML-provisioned — open http://localhost:8123, finish onboarding, add the
+# MQTT integration with host "mosquitto" and the credentials from .env.
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/passwd:/mosquitto/config/passwd:ro
+      - mosquitto-data:/mosquitto/data
+    healthcheck:
+      test:
+        - CMD
+        - mosquitto_sub
+        - -t
+        - $$SYS/broker/uptime
+        - -C
+        - "1"
+        - -u
+        - ${MQTT_USER:?set in .env}
+        - -P
+        - ${MQTT_PASSWORD:?set in .env}
+        - -i
+        - healthcheck
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2025.12
+    restart: unless-stopped
+    ports:
+      - "8123:8123"
+    environment:
+      TZ: ${TZ:-Europe/Stockholm}
+    volumes:
+      - ha-data:/config
+      # The repo is the source of truth for the package and blueprints; HA
+      # keeps its own runtime state (.storage, db) in the named volume.
+      - ./homeassistant/configuration.yaml:/config/configuration.yaml:ro
+      - ../homeassistant/packages:/config/packages:ro
+      - ../homeassistant/blueprints/automation/printtrek:/config/blueprints/automation/printtrek:ro
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+
+volumes:
+  mosquitto-data:
+  ha-data:

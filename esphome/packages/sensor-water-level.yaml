@@ -1,0 +1,80 @@
+# =============================================================================
+# PrintTrek — packages/sensor-water-level.yaml
+# -----------------------------------------------------------------------------
+# Water tank level from a resistive level sender (or any sensor that maps
+# level to a voltage) on an ESP32 ADC1 pin. Wire the sender as the lower leg
+# of a divider from 3.3 V; ADC2 pins cannot be used — they conflict with WiFi.
+#
+# Calibration: watch "Water Level Raw Voltage" (diagnostic entity) with the
+# tank empty and again brim full, then set water_raw_empty_v /
+# water_raw_full_v accordingly. See docs/HARDWARE.md. Resistive senders are
+# coarse (roughly 10 % steps) — good enough for "do I need to fill up".
+#
+# water_level is the dry-run input to automation-water.yaml. No sender?
+# Include packages/water-no-sensor.yaml instead and the pump protection
+# degrades to runtime-watchdog only.
+#
+# Substitutions:
+#   water_adc_pin           ADC1 pin (default: GPIO34, input-only)
+#   water_update_interval   Sample rate (default: 30s)
+#   water_raw_empty_v       Sender voltage, tank empty -> 0 %   (default: 0.35)
+#   water_raw_full_v        Sender voltage, tank full  -> 100 % (default: 2.40)
+#   water_sensor_id         Sensor id (default: water_level).
+#                           Referenced by automation-water.yaml.
+#   tank_volume_l           Tank size for the liters readout (default: 40)
+#
+# Provides:
+#   sensor id ${water_sensor_id} (%, 0 = empty, 100 = full)
+#   sensor id ${water_sensor_id}_raw (V, diagnostic, for calibration)
+#   sensor id water_volume (L, derived)
+# =============================================================================
+
+substitutions:
+  water_adc_pin: GPIO34
+  water_update_interval: 30s
+  water_raw_empty_v: "0.35"
+  water_raw_full_v: "2.40"
+  water_sensor_id: water_level
+  tank_volume_l: "40"
+
+sensor:
+  - platform: adc
+    pin: ${water_adc_pin}
+    id: ${water_sensor_id}_raw
+    name: Water Level Raw Voltage
+    attenuation: 12db
+    update_interval: ${water_update_interval}
+    accuracy_decimals: 3
+    entity_category: diagnostic
+    filters:
+      - median:
+          window_size: 7
+          send_every: 1
+          send_first_at: 1
+
+  - platform: copy
+    source_id: ${water_sensor_id}_raw
+    id: ${water_sensor_id}
+    name: Water Level
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+    accuracy_decimals: 0
+    filters:
+      - calibrate_linear:
+          - ${water_raw_empty_v} -> 0.0
+          - ${water_raw_full_v} -> 100.0
+      - clamp:
+          min_value: 0
+          max_value: 100
+
+  - platform: template
+    id: water_volume
+    name: Water Volume
+    unit_of_measurement: L
+    icon: mdi:water
+    accuracy_decimals: 1
+    update_interval: 60s
+    lambda: |-
+      if (std::isnan(id(${water_sensor_id}).state))
+        return NAN;
+      return id(${water_sensor_id}).state * ${tank_volume_l} / 100.0;

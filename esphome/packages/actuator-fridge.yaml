@@ -1,0 +1,71 @@
+# =============================================================================
+# PrintTrek — packages/actuator-fridge.yaml
+# -----------------------------------------------------------------------------
+# 12 V compressor fridge (Dometic CFX / Engel class) supply relay. The fridge
+# is the trailer's most important load and the LAST to be shed, so it is NOT
+# a raw actuator switch: user intent lives in the retained, flash-persisted
+# "Fridge Enabled" setpoint, and the relay itself is internal, driven by a
+# local control loop:
+#
+#     relay ON  <=>  Fridge Enabled  AND  load_shed_tier < 3
+#
+# That gives two properties a plain gpio switch cannot:
+#   * sleeping-safe control — "Fridge Enabled" is a retained setpoint
+#     (PROTOCOL.md), safe to toggle from HA while the radio sleeps, unlike
+#     pump/lights commands
+#   * automatic recovery — when the battery comes back from tier 3, the
+#     relay re-closes by itself; food does not silently spoil because a
+#     shed event needed a manual re-enable
+#
+# The observable relay state is exposed as binary_sensor `fridge_power`.
+# Fridge compartment temperature is a separate package
+# (sensor-fridge-ds18b20.yaml); warm-fridge alerting lives in HA.
+#
+# Substitutions:
+#   fridge_pin              Relay/MOSFET gate pin (default: GPIO25)
+#   fridge_check_interval_s Control-loop tick (default: 10)
+#
+# Provides:
+#   switch id fridge_enabled (setpoint), binary_sensor id fridge_power
+# =============================================================================
+
+substitutions:
+  fridge_pin: GPIO25
+  fridge_check_interval_s: "10"
+
+switch:
+  - platform: gpio
+    pin: ${fridge_pin}
+    id: fridge_relay
+    internal: true
+    restore_mode: RESTORE_DEFAULT_ON
+  - platform: template
+    id: fridge_enabled
+    name: Fridge Enabled
+    icon: mdi:fridge-outline
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    command_retain: true
+
+binary_sensor:
+  - platform: template
+    id: fridge_power
+    name: Fridge Power
+    device_class: power
+    lambda: 'return id(fridge_relay).state;'
+
+interval:
+  - interval: ${fridge_check_interval_s}s
+    then:
+      - lambda: |-
+          const bool want = id(fridge_enabled).state &&
+                            id(load_shed_tier) < 3;
+          if (want != id(fridge_relay).state) {
+            if (!want && id(load_shed_tier) >= 3)
+              ESP_LOGW("fridge", "load-shed tier 3: cutting fridge supply");
+            if (want)
+              id(fridge_relay).turn_on();
+            else
+              id(fridge_relay).turn_off();
+          }
