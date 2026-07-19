@@ -1,25 +1,10 @@
 # PrintTrek
 
-![Chassis — the load-bearing core](chassis.png)
-
-*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a **V-drawbar** of two straight square-cut arms in the SAME 50×50×3 profile — tied at the apex by a flat CNC plate sandwich (no welds, no miter cuts), sleeve-clamped at the front crossbeam (bolts beside the arm — no holes in it), through-bolted at the rail ends — and a braked torsion axle matching the Ford Ranger's 1560 mm track. Lateral towing loads go AXIAL through the triangle instead of bending a single beam (combined-case SF 3.0 vs 1.8). Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
-
-## Structural Analysis
-
-Hand-calcs (`python3 scripts/beam_check.py`) + CalculiX FEA, both validated against each other. Rebuild every derived artifact (FEA decks + solve + all renders + mass budget) on any machine with `scripts/regen_all.sh`, and gate commits with `scripts/verify_design.sh` (read-only: renders, deck drift, budget flags, FEA safety factors). FEA alone: `scripts/run_fea.sh` (needs `ccx`; renders need `pip install numpy matplotlib`). Materials: S355 steel for all VKR beams, 6082-T6 aluminum for all CNC-milled plates.
-
-| | |
-|---|---|
-| ![Whole chassis, 3g](fea/frame_global_3g_stress.png) | ![Whole chassis, racking](fea/frame_global_twist_stress.png) |
-| **Whole chassis, 3g deck load** — rails 130 / crossbeams 16 / V-arms 31 MPa, **SF ≥ 2.7 on every member** (bounding: full 400 kg at 3g); bolted laps appear as connectors (28 MPa — bolt preload/friction budget in `check_v_joints`) | **Whole chassis, diagonal racking** (one corner lifted 30 mm) — 74/70 MPa; the bolted ladder frame is torsionally soft, which is what you want off-road |
-| ![Drawbar FEA](fea/drawbar_cantilever_stress.png) | ![Corner plate FEA](fea/corner_plate_bending_stress.png) |
-| **Single-bar drawbar** (legacy variant, kept as solver validation): 85 MPa at the root, SF ≈ 4 — matches the hand calc | **Corner plate** (aluminum, prying bound): 106 MPa at the clamp line, SF ≈ 2.5 even with one plate taking the full couple |
-
-The fatigue-governing detail of any bolted drawbar is a bolt hole at the peak-moment point (`check_joint_hole` / `check_v_joints` in `beam_check.py`), so the rule everywhere is **no holes where bending peaks**: at the front-crossbeam crossing the V-arms are CLAMPED — two bolts pass through the crossbeam *beside* the arm, through spacer sleeves, pulling a plate up under it — and through-bolted only at the rail ends and apex plates, where arm moment is ~zero. Every structural bolt runs at full preload on a crush sleeve, so service loads are carried by **friction grip** (SF ≥ 3.9, `check_v_joints`) — the bolts never work in shear and the holes stay clamped shut. Per-member tables and model notes in [`fea/README.md`](fea/README.md).
-
 **PrintTrek** is an open-source, highly engineered, and modular offroad adventure trailer designed to be manufactured using a custom CNC router (like the PrintNC) and basic hand tools.
 
-Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek eliminates the need for complex and fatigue-prone welding by utilizing a structural, bolted-together chassis. It is specifically designed to be the perfect companion for a mid-size pickup (like the Ford Ranger), matching its track width, wheel specs, and offroad capabilities.
+The whole chassis is bolted together, not welded. That is the point: you do not need welding experience, a welder, or a shop to build one. If you can drill, bolt, and torque to a spec, you can assemble the frame at home with hand tools, and the result is a joint that does not carry the fatigue risk of a bad weld you cannot inspect.
+
+Built to traverse rugged terrain and function as an ultimate basecamp, it is specifically designed to be the perfect companion for a mid-size pickup (like the Ford Ranger), matching its track width, wheel specs, and offroad capabilities.
 
 ## Project Goals
 
@@ -40,6 +25,23 @@ Built to traverse rugged terrain and function as an ultimate basecamp, PrintTrek
   - Modular "Power Station" 12V box, 230V mains integration, and Teltonika 5G network integration.
 - **Slide-Out Kitchen:** Accommodates a heavy-duty drawer (100-150kg slides) for a 12V compressor fridge (e.g., Dometic CFX), fed via an electrical-only energy chain. Propane stays on fixed pipes to external quick-connects for outdoor cooking.
 - **ESPHome + Home Assistant Control:** An ESP32 running ESPHome (relays + sensors, MQTT) with Home Assistant as the UI — monitoring water level, battery voltage/current, and temperatures, and switching the pump, lights, and fridge directly. Battery protection (tiered load shedding), pump dry-run cutoff, and runtime watchdogs run locally on the ESP32, so the network can be down without risk. Includes a full software twin: the real firmware runs under QEMU in a container against your own broker (`docs/SIMULATION.md`).
+
+![Chassis — the load-bearing core](chassis.png)
+
+*The load-bearing core (what the project stands or falls on): 2000×1200 mm bolted VKR 50×50×3 frame with CNC-milled corner/T-plates, a **V-drawbar** of two straight square-cut arms in the SAME 50×50×3 profile — tied at the apex by a flat CNC plate sandwich (no welds, no miter cuts), sleeve-clamped at the front crossbeam (bolts beside the arm — no holes in it), through-bolted at the rail ends — and a braked torsion axle matching the Ford Ranger's 1560 mm track. Lateral towing loads go AXIAL through the triangle instead of bending a single beam (combined-case SF 3.0 vs 1.8). Sizing math lives in `scripts/beam_check.py` + `fea/`. Everything else (body, galley, systems) is ideation-stage layout on top of this chassis.*
+
+## Structural Analysis
+
+Hand-calcs (`python3 scripts/beam_check.py`) + CalculiX FEA, both validated against each other. Rebuild every derived artifact (FEA decks + solve + all renders + mass budget) on any machine with `scripts/regen_all.sh`, and gate commits with `scripts/verify_design.sh` (read-only: renders, deck drift, budget flags, FEA safety factors). FEA alone: `scripts/run_fea.sh` (needs `ccx`; renders need `pip install numpy matplotlib`). Materials: S355 steel for all VKR beams, 6082-T6 aluminum for all CNC-milled plates.
+
+| | |
+|---|---|
+| ![Whole chassis, 3g](fea/frame_global_3g_stress.png) | ![Whole chassis, racking](fea/frame_global_twist_stress.png) |
+| **Whole chassis, 3g deck load** — rails 130 / crossbeams 16 / V-arms 31 MPa, **SF ≥ 2.7 on every member** (bounding: full 400 kg at 3g); bolted laps appear as connectors (28 MPa — bolt preload/friction budget in `check_v_joints`) | **Whole chassis, diagonal racking** (one corner lifted 30 mm) — 74/70 MPa; the bolted ladder frame is torsionally soft, which is what you want off-road |
+| ![Drawbar FEA](fea/drawbar_cantilever_stress.png) | ![Corner plate FEA](fea/corner_plate_bending_stress.png) |
+| **Single-bar drawbar** (legacy variant, kept as solver validation): 85 MPa at the root, SF ≈ 4 — matches the hand calc | **Corner plate** (aluminum, prying bound): 106 MPa at the clamp line, SF ≈ 2.5 even with one plate taking the full couple |
+
+The fatigue-governing detail of any bolted drawbar is a bolt hole at the peak-moment point (`check_joint_hole` / `check_v_joints` in `beam_check.py`), so the rule everywhere is **no holes where bending peaks**: at the front-crossbeam crossing the V-arms are CLAMPED — two bolts pass through the crossbeam *beside* the arm, through spacer sleeves, pulling a plate up under it — and through-bolted only at the rail ends and apex plates, where arm moment is ~zero. Every structural bolt runs at full preload on a crush sleeve, so service loads are carried by **friction grip** (SF ≥ 3.9, `check_v_joints`) — the bolts never work in shear and the holes stay clamped shut. Per-member tables and model notes in [`fea/README.md`](fea/README.md).
 
 ## Design Snapshots (ideation-stage layout)
 
