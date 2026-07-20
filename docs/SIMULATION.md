@@ -25,6 +25,11 @@ by the same C++ that runs in the trailer.
             YOUR broker ──► YOUR Home Assistant
 ```
 
+The simulator engine (container build, web UI, QEMU glue) lives in the
+shared [esphome-skills](https://github.com/heavy-oil1462/esphome-skills)
+package; the PrintTrek side is `tools/project.py` (injections, presets,
+node names) and `tools/test_sim.py` (rule assertions).
+
 ## Quickstart
 
 ```bash
@@ -93,7 +98,7 @@ low-water pump refusal, tier 1/2/3 escalation (lights shed, fridge cut),
 and cascaded recovery with the fridge relay restoring itself.
 Requirements: an esphome that can compile (pip fallback if the nix
 platformio wrapper can't run its sandbox), `qemu-esp32` (in the `.#sim`
-devshell via the `nix-qemu-espressif` flake input — kept out of the default
+devshell via the `esphome-skills` flake input — kept out of the default
 shell because it may build QEMU from source once), and the ability to bind
 udp/123 (root/CAP_NET_BIND_SERVICE) — lwIP's SNTP port is not configurable.
 Slow (a compile plus several minutes of emulated control-loop time);
