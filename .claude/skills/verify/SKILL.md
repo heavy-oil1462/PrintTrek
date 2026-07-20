@@ -53,14 +53,10 @@ A missing toolchain is a FAILURE, not a skip.
 - A `[FAIL]` in step 6/7 prints the tool's tail; run the tool directly for
   the full report (`nix develop -c python3 tools/validate.py`).
 
-## Notes (sandbox landmines)
+## Notes
 
-- In sandboxes where nix lacks a build group, export first:
-  `export NIX_CONFIG="experimental-features = nix-command flakes
-  build-users-group =
-  sandbox = false"`
-- Without nix: needs `yamllint`, `esphome` (or `.venv/bin/esphome`),
-  `mosquitto`, and python3.11+ with pyyaml + paho-mqtt on PATH.
-- Full firmware C++ build is NOT part of the gate (slow):
-  `nix develop -c esphome compile esphome/example-trailer.yaml` after
-  touching lambdas — `esphome config` does not catch C++ errors.
+The control-system gate framework lives in the esphome-skills package
+(flake input); the repo side is tools/project.py + tools/validate.py.
+Canonical doc and landmines (NIX_CONFIG for sandboxes, running without
+nix, esphome config vs compile):
+https://github.com/heavy-oil1462/esphome-skills/blob/main/skills/verify.md

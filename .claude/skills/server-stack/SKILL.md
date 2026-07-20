@@ -5,45 +5,26 @@ description: Bring up, check, or manage the PrintTrek DEV server stack (mosquitt
 
 # PrintTrek dev server stack
 
-Everything goes through `tools/stack.py` — do not run raw `docker compose`
-or craft ad-hoc mosquitto commands. This stack is dev/test only; production
-will be a nix-managed stack on the trailer's Raspberry Pi (HA, Grafana,
-Loki, Prometheus), maintained separately.
-
-## Commands
+Everything goes through `tools/stack.py` (plumbing: esphome_skills.stack);
+do not run raw `docker compose` or craft ad-hoc mosquitto commands.
+Services: mosquitto, homeassistant.
 
 ```bash
-python3 tools/stack.py init    # once: generate server/.env + mosquitto passwd
-python3 tools/stack.py up      # docker compose up -d (requires init)
+python3 tools/stack.py init    # once: server/.env + mosquitto passwd
+python3 tools/stack.py up
 python3 tools/stack.py smoke   # MQTT round trip + HA reachable
-python3 tools/stack.py status
 python3 tools/stack.py logs [mosquitto|homeassistant]
 python3 tools/stack.py down
-python3 tools/stack.py passwd <user> <password>   # extra MQTT users
 ```
 
-Needs Docker on the host. `init` needs `mosquitto_passwd` (devshell:
-`nix develop -c python3 tools/stack.py init`) or falls back to the docker
-image. Generated secrets land in `server/.env` (gitignored).
+Endpoints after `up`: Home Assistant http://localhost:8123, MQTT
+localhost:1883 (authenticated).
 
-## Endpoints after `up`
+One-time HA setup that cannot be YAML-provisioned: open
+http://localhost:8123, finish onboarding, add the MQTT integration (host
+"mosquitto", credentials from server/.env). The compose file mounts the
+repo's homeassistant/ package and blueprint dirs; tools/validate.py's ha
+check keeps those mounts honest.
 
-- Home Assistant: http://localhost:8123 (first boot takes ~1 min)
-- MQTT: localhost:1883 (authenticated, no anonymous)
-
-## One-time HA setup (cannot be YAML-provisioned)
-
-After first `up`: open HA, finish onboarding, then Settings -> Devices and
-Services -> Add integration -> MQTT, host `mosquitto`, credentials from
-`server/.env`. The trailer package and blueprints are already mounted from
-the repo's homeassistant/ directory.
-
-## Debugging
-
-- Node/mock connects but no entities in HA: the MQTT integration is not
-  configured (see above), or discovery topics were cleared — restart the
-  node/mock with `--discovery`.
-- Live traffic inspection: the mock-device skill plus
-  `mosquitto_sub -h localhost -u <user> -P <pass> -t 'printtrek/#' -v`.
-- Auth failures: regenerate with `init` after deleting server/.env and
-  server/mosquitto/passwd.
+Canonical doc:
+https://github.com/heavy-oil1462/esphome-skills/blob/main/skills/server-stack.md

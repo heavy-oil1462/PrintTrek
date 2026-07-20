@@ -4,7 +4,7 @@
 # Injectable replacements for every stock hardware sensor. Each sensor
 # carries the exact id + name of its hardware counterpart, so the real
 # automation packages (water / load shedding / fridge control) run unmodified
-# against values you set from the simulator web UI (sim/webui.py) — or from
+# against values you set from the simulator web UI (esphome_skills.webui) — or from
 # anything that publishes to the injection topics:
 #
 #   <mqtt_root>/<node_name>/sim/battery          V    (Battery Voltage)
