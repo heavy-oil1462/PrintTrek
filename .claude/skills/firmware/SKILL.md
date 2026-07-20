@@ -20,13 +20,13 @@ nix develop -c esphome run esphome/example-trailer.yaml      # flash via USB/OTA
 nix develop -c esphome logs esphome/example-trailer.yaml
 ```
 
-Sandbox note: nixpkgs' platformio wrapper needs user namespaces. If compile
-fails with `bwrap: ... Operation not permitted`, use a pip venv instead:
-`python3 -m venv .venv && .venv/bin/pip install esphome && .venv/bin/esphome compile ...`
-
 `esphome config` on both node configs is part of the verify gate
 (tools/validate.py); run a full `compile` after touching lambdas — config
 validation does NOT catch C++ errors.
+
+Canonical doc and landmines (bwrap/venv fallback, git-tracked files under
+nix, duty-cycled logs):
+https://github.com/heavy-oil1462/esphome-skills/blob/main/skills/firmware.md
 
 ## Editing rules (the OSS contract, see docs/EXTENDING.md)
 
