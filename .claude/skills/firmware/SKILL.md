@@ -13,11 +13,15 @@ cp esphome/secrets.yaml.example esphome/secrets.yaml   # then edit real values
 
 ## Build / flash
 
+All commands need esphome on PATH (`pip install -r requirements.txt`
+or the devshell `nix develop`, prefixing each command with
+`nix develop -c`):
+
 ```bash
-nix develop -c esphome config esphome/example-trailer.yaml   # fast validation
-nix develop -c esphome compile esphome/example-trailer.yaml  # full C++ build
-nix develop -c esphome run esphome/example-trailer.yaml      # flash via USB/OTA
-nix develop -c esphome logs esphome/example-trailer.yaml
+esphome config esphome/example-trailer.yaml    # fast validation
+esphome compile esphome/example-trailer.yaml   # full C++ build
+esphome run esphome/example-trailer.yaml       # flash via USB/OTA
+esphome logs esphome/example-trailer.yaml
 ```
 
 `esphome config` on both node configs is part of the verify gate

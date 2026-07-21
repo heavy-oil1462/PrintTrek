@@ -1,0 +1,14 @@
+# The no-nix toolchain for the software gate (tools/validate.py,
+# tools/test_protocol.py and steps 6-7 of scripts/verify_design.sh).
+# The nix devshell (flake.nix) provides the same tools and stays the
+# pinned reference; either works.
+#
+#     pip install -r requirements.txt
+#
+# Beyond python the gate needs system packages: mosquitto (protocol
+# test), CalculiX ccx (FEA safety factors), and a 2024+ OpenSCAD dev
+# snapshot on PATH or in $OPENSCAD for the CAD steps (see
+# scripts/render_scad.sh).
+esphome-skills[mqtt] @ git+https://github.com/heavy-oil1462/esphome-skills
+esphome>=2025.5
+yamllint>=1.35
