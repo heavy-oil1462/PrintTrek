@@ -20,9 +20,11 @@
 #   7. MQTT protocol integration test (tools/test_protocol.py: throwaway
 #      broker + mock device)
 #
-# Steps 6-7 need the devshell toolchain (esphome, yamllint, mosquitto,
-# paho-mqtt). They run directly if the tools are on PATH, else through
-# `nix develop`. Missing toolchain is a FAILURE, not a skip.
+# Nix is optional. Steps 6-7 need esphome, yamllint, mosquitto and
+# paho-mqtt, from either a plain `pip install -r requirements.txt` (plus
+# the mosquitto system package) or the devshell. They run directly if
+# the tools are on PATH, else through `nix develop`. Missing toolchain
+# is a FAILURE, not a skip.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 ROOT=$PWD
@@ -88,7 +90,7 @@ step "[5/7] Global FEA safety factors (needs ccx)"
 if [ -n "${CCX:-}" ]; then :
 elif command -v ccx >/dev/null 2>&1; then CCX=$(command -v ccx)
 elif command -v nix-build >/dev/null 2>&1; then
-    CCX="$(nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A calculix --no-out-link 2>/dev/null)/bin/ccx"
+    CCX="$(nix-build -I "nixpkgs=$(cat scripts/nixpkgs_channel)" '<nixpkgs>' -A calculix --no-out-link 2>/dev/null)/bin/ccx"
 fi
 if [ -x "${CCX:-/nonexistent}" ]; then
     RUN=(env); case "$CCX" in /nix/store/*) RUN=(env -u LD_LIBRARY_PATH);; esac

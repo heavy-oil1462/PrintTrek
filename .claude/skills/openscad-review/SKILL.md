@@ -1,24 +1,29 @@
 ---
 name: openscad-review
-description: Render and review the OpenSCAD models in /cad headlessly (via nix, no GUI needed). Use after any .scad change, or when asked to verify/review the CAD. Checks compile warnings, visual correctness, manifold geometry, and this project's design rules.
+description: Render and review the OpenSCAD models in /cad headlessly (no GUI needed). Use after any .scad change, or when asked to verify/review the CAD. Checks compile warnings, visual correctness, manifold geometry, and this project's design rules.
 ---
 
 # OpenSCAD Review
 
 Review OpenSCAD changes by actually rendering them — never approve a .scad edit from source reading alone.
 
-## Rendering (headless, via nix)
+## Rendering (headless)
 
-Use the helper script — it fetches OpenSCAD + Mesa from nixpkgs and renders without any display:
+Use the helper script — it renders without any display:
 
 ```bash
 scripts/render_scad.sh cad/<file>.scad <out.png|out.stl> [extra openscad args]
 ```
 
+It resolves OpenSCAD as `$OPENSCAD`, then a 2024+ openscad on PATH, then
+nix (openscad-unstable + Mesa from the channel pinned in
+scripts/nixpkgs_channel). Nix is the fallback, not a requirement.
+
 Notes learned the hard way (do not rediscover these):
 - `nix-shell --run` segfaults in some sandboxes; the script uses `nix-build` store paths directly instead.
-- The sandbox's `LD_LIBRARY_PATH=/lib` makes nix binaries load the system libc and segfault. The script overrides `LD_LIBRARY_PATH` with only the nix GL libs. If you run openscad manually, do the same.
-- PNG rendering needs GL: the script uses Mesa software rendering via `EGL_PLATFORM=surfaceless` (no X/xvfb required).
+- The sandbox's `LD_LIBRARY_PATH=/lib` makes nix binaries load the system libc and segfault. The script overrides `LD_LIBRARY_PATH` with only the nix GL libs (and never touches it for a PATH/AppImage binary). If you run openscad manually, do the same.
+- PNG rendering needs GL: with no display the script forces Mesa software rendering via `EGL_PLATFORM=surfaceless` (no X/xvfb required). CI runs it under xvfb with the system GL runtime instead; both work.
+- The 2021.01 release openscad is too old (no Manifold backend); the script rejects it and falls through to nix.
 
 ## Review procedure
 

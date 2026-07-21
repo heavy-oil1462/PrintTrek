@@ -37,9 +37,11 @@ What it checks:
 7. **MQTT protocol test** — `tools/test_protocol.py`: throwaway broker +
    mock device, asserts the docs/PROTOCOL.md contract.
 
-Steps 6-7 need the devshell toolchain (esphome, yamllint, mosquitto); the
-script uses PATH binaries when present and falls back to `nix develop`.
-A missing toolchain is a FAILURE, not a skip.
+Nix is optional. Steps 6-7 need esphome, yamllint and mosquitto: from
+PATH (`pip install -r requirements.txt` plus the mosquitto system
+package) or, as fallback, `nix develop`. OpenSCAD resolves as
+`$OPENSCAD`, then a 2024+ openscad on PATH, then nix; ccx as `$CCX`,
+PATH, then nix. A missing step 6-7 toolchain is a FAILURE, not a skip.
 
 ## Interpreting results
 
@@ -52,6 +54,16 @@ A missing toolchain is a FAILURE, not a skip.
   host — the host has CalculiX installed.
 - A `[FAIL]` in step 6/7 prints the tool's tail; run the tool directly for
   the full report (`nix develop -c python3 tools/validate.py`).
+
+## CI
+
+CI (.github/workflows) runs the same gates from pip, no nix, split by
+paths: validate.yml runs tools/validate.py + tools/test_protocol.py on
+every change; design.yml runs the full scripts/verify_design.sh (apt
+CalculiX, OpenSCAD snapshot AppImage) when cad/fea/scripts/tools move;
+firmware.yml compiles both node configs when esphome/ moves. Never let
+CI and this skill drift apart: a check added here gets added there in
+the same change.
 
 ## Notes
 

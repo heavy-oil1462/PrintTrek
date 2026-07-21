@@ -20,7 +20,7 @@ elif command -v ccx >/dev/null 2>&1; then
     CCX=$(command -v ccx)
 elif command -v nix-build >/dev/null 2>&1; then
     echo "[i] ccx not on PATH - building via nix (first run downloads ~40 MB)"
-    CCX="$(nix-build -I nixpkgs=channel:nixos-25.05 '<nixpkgs>' -A calculix --no-out-link)/bin/ccx"
+    CCX="$(nix-build -I "nixpkgs=$(cat scripts/nixpkgs_channel)" '<nixpkgs>' -A calculix --no-out-link)/bin/ccx"
 else
     echo "ERROR: CalculiX 'ccx' not found." >&2
     echo "  Debian/Ubuntu:  sudo apt install calculix-ccx" >&2

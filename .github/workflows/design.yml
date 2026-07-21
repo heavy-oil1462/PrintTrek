@@ -1,0 +1,59 @@
+# The full design gate: CAD renders in every toggle state, FEA deck
+# drift, mass/tongue budget, hand calcs, global FEA safety factors, and
+# the software gate steps behind them. Only design-side changes can move
+# it, so it triggers on those paths alone; the validate workflow covers
+# everything else.
+#
+# No nix: pip, apt CalculiX/mosquitto, and the latest OpenSCAD snapshot
+# AppImage. The FEA deck drift check is pure python and therefore
+# toolchain-independent; the nix flake remains the pinned local path.
+name: design
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cad/**"
+      - "fea/**"
+      - "scripts/**"
+      - "tools/**"
+      - "requirements.txt"
+      - ".github/workflows/design.yml"
+  pull_request:
+    paths:
+      - "cad/**"
+      - "fea/**"
+      - "scripts/**"
+      - "tools/**"
+      - "requirements.txt"
+      - ".github/workflows/design.yml"
+
+jobs:
+  design:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install gate toolchain
+        run: |
+          pip install -r requirements.txt
+          sudo apt-get update && sudo apt-get install -y \
+            mosquitto calculix-ccx xvfb \
+            libegl1 libegl-mesa0 libgl1 libglx-mesa0 libgbm1 libopengl0
+      - name: install OpenSCAD nightly
+        # AppImage from the official snapshot server, extracted so no
+        # FUSE is needed (there is no nightly PPA); the GL runtime it
+        # expects is installed above
+        run: |
+          latest=$(curl -s https://files.openscad.org/snapshots/ \
+            | grep -oE 'OpenSCAD-[0-9.]+-x86_64\.AppImage' | sort -u | tail -1)
+          echo "using $latest"
+          curl -sLO "https://files.openscad.org/snapshots/$latest"
+          chmod +x "$latest"
+          "./$latest" --appimage-extract > /dev/null
+          echo "OPENSCAD=$PWD/squashfs-root/AppRun" >> "$GITHUB_ENV"
+          "$PWD/squashfs-root/AppRun" --version
+      - name: design gate
+        run: xvfb-run -a scripts/verify_design.sh

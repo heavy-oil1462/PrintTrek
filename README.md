@@ -54,7 +54,7 @@ The body/galley layout is still being iterated and does not drive the structure.
 
 ## Control System (ESPHome + Home Assistant)
 
-The trailer is controlled by an ESP32 running [ESPHome](https://esphome.io) with Home Assistant as the UI. Everything below runs inside the dev shell (`nix develop`):
+The trailer is controlled by an ESP32 running [ESPHome](https://esphome.io) with Home Assistant as the UI. Everything below needs the toolchain on PATH — `pip install -r requirements.txt` (plus the mosquitto system package) or the pinned dev shell (`nix develop`), whichever you prefer:
 
 ```bash
 python3 tools/stack.py init && python3 tools/stack.py up   # dev stack: mosquitto + HA
@@ -70,6 +70,10 @@ python3 tools/sim_container.py run --broker <mqtt-host> --username u --password 
 ```
 
 The node is live on the network by default (direct switch control from HA); a duty-cycled storage mode with retained setpoints is one switch away. Safety logic — tiered battery load shedding, pump dry-run cutoff, runtime watchdogs — runs locally on the ESP32 regardless of connectivity. The MQTT contract is in [`docs/PROTOCOL.md`](docs/PROTOCOL.md); adopt/extend via composable packages per [`docs/EXTENDING.md`](docs/EXTENDING.md); controller wiring in [`docs/HARDWARE.md`](docs/HARDWARE.md).
+
+## Toolchain and CI
+
+Nix is optional everywhere. The software gate needs python3 plus esphome, yamllint and the esphome_skills package (`pip install -r requirements.txt` or `nix develop`); the CAD pipeline needs a 2024+ OpenSCAD dev snapshot, resolved as `$OPENSCAD`, then `openscad` on PATH, then nix; CalculiX resolves the same way (`$CCX`, PATH, nix). The pre-commit gate is `scripts/verify_design.sh`, and CI (`.github/workflows/`) runs exactly the same gates from pip with no nix: `validate.yml` (configs + MQTT protocol test) on every change, `design.yml` (CAD renders, FEA drift and safety factors, mass budget) on design-side paths, `firmware.yml` (full C++ build of both node configs) on firmware paths.
 
 ## Repository Structure
 
